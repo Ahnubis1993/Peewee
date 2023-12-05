@@ -1,0 +1,7 @@
+usuario:root
+contrasenia:alumno
+host:localhost
+puerto:3306
+
+
+docker run --detach --name some-mariadb --env MARIADB_USER=root --env MARIADB_PASSWORD=alumno --env MARIADB_DATABASE=jorgeGomez_gustavoPlaza --env MARIADB_ROOT_PASSWORD=alumno mariadb:latest
