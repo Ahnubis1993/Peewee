@@ -52,7 +52,7 @@ def conectar():
         # Si la base de datos no existe, crearla
         cursor.execute("CREATE DATABASE IF NOT EXISTS jorgeGomez_gustavoPlaza")
         
-        # Seleccionar la base de datos Concesionario
+        # Seleccionar la base de datos
         conexion.select_db('jorgeGomez_gustavoPlaza')
         print("Conexión establecida correctamente")
         return conexion
@@ -62,4 +62,14 @@ def conectar():
         print(f"Error de conexión: {e}") 
         return None
     
-conectar()
+def insertarFila(conexion, nombreTabla, sentenciaSQL):
+    
+    if(nombreTabla is not None):
+        if(nombreTabla=="Profesores"):
+            print("Tabla profesores")
+        elif(nombreTabla=="Alumnos"):
+            print("Tabla alumnos")
+        elif(nombreTabla=="Cursos"):
+            print("Tabla cursos")
+    else:
+        print("Tienes que introducir el nombre de la tabla")
