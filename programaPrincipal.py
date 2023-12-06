@@ -1,10 +1,11 @@
-from gestionAlumnos import menuAlumnos
-from gestionCursos import menuCursos
-from gestionProfesores import menuProfesores
-from gestorBBD import conectar
+from GestionAlumnos import menuAlumnos
+from GestionCursos import menuCursos
+from GestionProfesores import menuProfesores
+from GestorBBD import conectar, crearTablas
 
 
 conexionBBDD = conectar()
+crearTablas(conexionBBDD)
 
 finMenuPrincipal = False
 

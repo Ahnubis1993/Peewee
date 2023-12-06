@@ -62,14 +62,50 @@ def conectar():
         print(f"Error de conexión: {e}") 
         return None
     
-def insertarFila(conexion, nombreTabla, sentenciaSQL):
+def crearTablaProfesores(conexion):
+    try:
+        cursor = conexion.cursor()
+        cursor.execute("CREATE TABLE IF NOT EXISTS Profesores("
+            "Id INT AUTO_INCREMENT PRIMARY KEY,"
+            "Dni VARCHAR(9)," 
+            "Nombre VARCHAR(25),"
+            "Direccion VARCHAR(25),"
+            "Telefono INT (9))")
+        conexion.commit()
+        cursor.close()
+    except:
+        print("Tabla Profesores no creada correctamente")
     
-    if(nombreTabla is not None):
-        if(nombreTabla=="Profesores"):
-            print("Tabla profesores")
-        elif(nombreTabla=="Alumnos"):
-            print("Tabla alumnos")
-        elif(nombreTabla=="Cursos"):
-            print("Tabla cursos")
-    else:
-        print("Tienes que introducir el nombre de la tabla")
+def crearTablaAlumnos(conexion):
+    try:
+        cursor = conexion.cursor()
+        cursor.execute("CREATE TABLE IF NOT EXISTS Alumnos("
+            "Num_Expediente INT AUTO_INCREMENT PRIMARY KEY," 
+            "Nombre VARCHAR(25),"
+            "Apellidos VARCHAR(25),"
+            "Telefono INT(9),"
+            "Direccion VARCHAR(25),"
+            # Formato fecha dd/mm/yyyy
+            "Fecha_Nacimiento DATE)"
+            )
+        conexion.commit()
+        cursor.close()
+    except:
+        print("Tabla Alumnos no creada correctamente")
+    
+def crearTablaCursos(conexion):
+    try:
+        cursor = conexion.cursor()
+        cursor.execute("CREATE TABLE IF NOT EXISTS Cursos("
+            "Codigo INT AUTO_INCREMENT PRIMARY KEY," 
+            "Nombre VARCHAR(25),"
+            "Descripcion VARCHAR(25))")
+        conexion.commit()
+        cursor.close() 
+    except:
+        print("Tabla Cursos no creada correctamente")
+        
+def crearTablas(conexion):
+    crearTablaAlumnos(conexion)
+    crearTablaProfesores(conexion)
+    crearTablaCursos(conexion)
