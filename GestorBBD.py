@@ -70,7 +70,7 @@ def crearTablaProfesores(conexion):
             "Dni VARCHAR(9)," 
             "Nombre VARCHAR(25),"
             "Direccion VARCHAR(25),"
-            "Telefono INT (9))")
+            "Telefono VARCHAR(9))")
         conexion.commit()
         cursor.close()
     except:

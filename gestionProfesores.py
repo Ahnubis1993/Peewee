@@ -66,9 +66,10 @@ def insertarProfesor(conexionBBDD):
             print("Fin alta Profesor")
             
         except:
-            print("Profesor no dado de alta, fallo en la sentencia Insert sql")
+            print("Profesor no dado de alta, fallo al introducir el profesor en la base de datos")
         finally:
-            cursor.close()
+            if (cursor is not None):
+                cursor.close()
 
     else:
         if(not confirmacion("No se ha realizado el alta. Deseas introducir un profesor? (S/N): ")):
@@ -169,7 +170,7 @@ def busquedaProfesor(conexionBBDD):
                 while(finIdProfesor is False):
                     idProfesor = input("Introduce el id del profesor a elegir")
                     if(idProfesor.isdigit()):
-                        idProfesorEncontrado = [filas for f in filas if(f[0]==int(idProfesor))]
+                        idProfesorEncontrado = [fila for fila in filas if(fila[0]==int(idProfesor))]
                         if(idProfesorEncontrado):
                             finBusqueda = True
                             id = idProfesorEncontrado[0]
