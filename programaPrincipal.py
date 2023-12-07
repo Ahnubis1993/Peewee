@@ -2,6 +2,7 @@ from GestionAlumnos import menuAlumnos
 from GestionCursos import menuCursos
 from GestionProfesores import menuProfesores
 from GestorBBDD import conectar, crearTablas
+from Vinculaciones import menuVinculaciones
 
 
 conexionBBDD = conectar()
@@ -14,6 +15,7 @@ while(not finMenuPrincipal):
     print("1 - Gestion Alumnos")
     print("2 - Gestion Profesores")
     print("3 - Gestion Cursos")
+    print("4 - Vinculaciones")
     print("0 - Fin Programa")
     opcion = input("Introduce una Opcion: ")
     
@@ -23,6 +25,8 @@ while(not finMenuPrincipal):
         menuProfesores(conexionBBDD)
     elif(opcion=="3"):
         menuCursos(conexionBBDD)
+    elif(opcion=="4"):
+        menuVinculaciones(conexionBBDD)
     elif(opcion=="0"):
         finMenuPrincipal=True
         conexionBBDD.close()

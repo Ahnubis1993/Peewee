@@ -1,4 +1,5 @@
 from Utilidades import confirmacion
+from pymysql import IntegrityError
 
 
 def insertarProfesor(conexionBBDD):
@@ -64,8 +65,13 @@ def insertarProfesor(conexionBBDD):
             if(not confirmacion("El alta del profesor se ha realizado correctamente. Deseas introducir otro profesor? (S/N): ")):
                 correcto = True
                 print("Fin alta Profesor")
-            
-        except:
+                
+        except IntegrityError as e:
+            if "Dni_UNIQUE" in str(e):
+                print("Ya existe un profesor con mismo DNI.")
+            else:
+                print("Error al introducir el curso en la base de datos")
+        except Exception:
             print("Profesor no dado de alta, fallo al introducir el profesor en la base de datos")
         finally:
             if (cursor is not None):
@@ -93,16 +99,18 @@ def eliminarProfesor(conexionBBDD):
             #TODO
             print("Consulta de borrado Profesor no valida")
         finally:
-            cursor.close()
+            if (cursor is not None):
+                cursor.close()
+            
     else:
         print("No hay resultados de busqueda. Fin baja profesor")
     
 def modificarProfesor(conexionBBDD):
     print("--- Modificacion Profesor ---")
     
-    idProfesor = busquedaProfesor(conexionBBDD)
-    
+    idProfesor = busquedaProfesor(conexionBBDD) 
     finModificacionProfesor = False
+    modificado = False
     
     if(idProfesor != -1):
         while(not finModificacionProfesor): 
@@ -117,12 +125,18 @@ def modificarProfesor(conexionBBDD):
                             cursor = conexionBBDD.cursor()
                             cursor.execute("UPDATE Profesores SET Dni=%s WHERE Id=%s", (nuevoDniProfesor, idProfesor))
                             conexionBBDD.commit()
-                            cursor.close()
                             print("El dni del profesor ha sido modificado correctamente")
+                            modificado = True
                         else:
                             print("Has cancelado la modificacion")
-                    except:
+                    except IntegrityError as e:
+                        if "Dni_UNIQUE" in str(e):
+                            print("Ya existe un profesor con mismo DNI.")
+                    except Exception:
                         print("Consulta por Dni no valida")
+                    finally:
+                        if (cursor is not None):
+                            cursor.close()
                 else:
                     print("El dni debe esta formado por 8 digitos y 1 letra")
             elif(opcion=="2"):
@@ -133,12 +147,15 @@ def modificarProfesor(conexionBBDD):
                             cursor = conexionBBDD.cursor()
                             cursor.execute("UPDATE Profesores SET Nombre=%s WHERE Id=%s", (nuevoNombreProfesor, idProfesor))
                             conexionBBDD.commit()
-                            cursor.close()
                             print("El nombre del profesor ha sido modificado correctamente")
+                            modificado = True
                         else:
                             print("Has cancelado la modificacion")
                     except:
                         print("Consulta por Nombre no valida")
+                    finally:
+                        if (cursor is not None):
+                            cursor.close()
                 else:
                     print("El nombre no puede estar vacio")
                 
@@ -150,12 +167,15 @@ def modificarProfesor(conexionBBDD):
                             cursor = conexionBBDD.cursor()
                             cursor.execute("UPDATE Profesores SET Direccion=%s WHERE Id=%s", (nuevaDireccionProfesor, idProfesor))
                             conexionBBDD.commit()
-                            cursor.close()
                             print("La direccion del profesor ha sido modificada correctamente")
+                            modificado = True
                         else:
                             print("Has cancelado la modificacion")
                     except:
                         print("Consulta por Direccion no valida")
+                    finally:
+                        if (cursor is not None):
+                            cursor.close()
                 else:
                     print("La direccion no puede estar vacia")
             
@@ -167,12 +187,15 @@ def modificarProfesor(conexionBBDD):
                             cursor = conexionBBDD.cursor()
                             cursor.execute("UPDATE Profesores SET Telefono=%s WHERE Id=%s", (nuevoTelefonoProfesor, idProfesor))
                             conexionBBDD.commit()
-                            cursor.close() 
                             print("El telefono del profesor ha sido modificado correctamente")  
+                            modificado = True
                         else:
                             print("Has cancelado la modificacion")                                        
                     except:
                         print("Consulta por Telefono no valida")
+                    finally:
+                        if (cursor is not None):
+                            cursor.close()
                 else:
                     print("El telefono debe tener una longitud de 9 digitos")
                 
@@ -182,7 +205,10 @@ def modificarProfesor(conexionBBDD):
             else:
                 print("Opcion no valida")
                 
-                #TODO hay que ver como se captura para pedir al USU si quieres volver a modificar
+            if(modificado):
+                if(not confirmacion("Deseas modificar algo mas de este profesor? (S/N): ")):
+                    finModificacionProfesor = True
+                
     else:
         print("No hay resultados de busqueda. Fin modificar profesor")
         
@@ -203,10 +229,12 @@ def busquedaProfesor(conexionBBDD):
                     cursor = conexionBBDD.cursor()
                     cursor.execute("SELECT * FROM Profesores WHERE Dni=%s", (dniProfesor))
                     filasTablaProfesor = cursor.fetchall()
-                    cursor.close()
                 except:
                     #TODO
                     print("Consulta por Dni no valida")
+                finally:
+                    if (cursor is not None):
+                        cursor.close()
             else:
                 print("El dni debe esta formado por 8 digitos y 1 letra")
         elif(opcion=="2"):
@@ -216,10 +244,12 @@ def busquedaProfesor(conexionBBDD):
                     cursor = conexionBBDD.cursor()
                     cursor.execute("SELECT * FROM Profesores WHERE Nombre=%s", (nombreProfesor))
                     filasTablaProfesor = cursor.fetchall()
-                    cursor.close()
                 except:
                     #TODO
                     print("Consulta por Nombre no valida")
+                finally:
+                    if (cursor is not None):
+                        cursor.close()
             else:
                 print("El nombre no puede estar vacio")
             
@@ -234,6 +264,9 @@ def busquedaProfesor(conexionBBDD):
                 except:
                     #TODO
                     print("Consulta por Direccion no valida")
+                finally:
+                    if (cursor is not None):
+                        cursor.close()
             else:
                 print("La direccion no puede estar vacia")
         
@@ -244,10 +277,12 @@ def busquedaProfesor(conexionBBDD):
                     cursor = conexionBBDD.cursor()
                     cursor.execute("SELECT * FROM Profesores WHERE Telefono=%s", (telefonoProfesor))
                     filasTablaProfesor = cursor.fetchall()
-                    cursor.close()
                 except:
                     #TODO
                     print("Consulta por Telefono no valida")
+                finally:
+                    if (cursor is not None):
+                        cursor.close()
             else:
                 print("El telefono debe tener una longitud de 9 digitos")
             
@@ -257,37 +292,35 @@ def busquedaProfesor(conexionBBDD):
         else:
             print("Opcion no valida")
             
-        if(finBusqueda is False):
+        if(not finBusquedaProfesor and filasTablaProfesor):
             print("--- Resultado ---")
-            filas = cursor.fetchall()
-            cursor.close()
             
-            for f in filas:
+            for f in filasTablaProfesor:
                 print("Id_Profesor:"+str(f[0])+"\n"
                       "Dni:"+f[1]+"\n"
                       "Nombre:"+f[2]+"\n"
                       "Direccion:"+f[3]+"\n"
                       "Telefono:"+str(f[4])+"\n")
             
-            if(len(filas)>1):
+            if(len(filasTablaProfesor)>1):
                 finIdProfesor = False
                 while(finIdProfesor is False):
-                    idProfesor = input("Introduce el id del profesor a elegir")
-                    if(idProfesor.isdigit()):
-                        idProfesorEncontrado = [fila for fila in filas if(fila[0]==int(idProfesor))]
+                    idProfesorBuscar = input("Introduce el id del profesor a elegir")
+                    if(idProfesorBuscar.isdigit()):
+                        idProfesorEncontrado = [fila for fila in filasTablaProfesor if(fila[0]==int(idProfesorBuscar))]
                         if(idProfesorEncontrado):
-                            finBusqueda = True
-                            id = idProfesorEncontrado[0]
+                            finBusquedaProfesor = True
+                            idProfesor = idProfesorEncontrado[0]
                     else:
                         print("Tienes que insertar un numero")
-            elif(len(filas)==1):
-                finBusqueda = True
-                id = filas[0][0]
+            elif(len(filasTablaProfesor)==1):
+                finBusquedaProfesor = True
+                idProfesor = filasTablaProfesor[0][0]
                 
-            else:
-                if(not confirmacion("No se han encontrado resultados. Deseas buscar de nuevo? (S/N): ")):
-                    finBusqueda = True
-    return id
+        else:
+            if(not confirmacion("No se han encontrado resultados. Deseas buscar de nuevo? (S/N): ")):
+                finBusquedaProfesor = True
+    return idProfesor
     
 
 def mostrarTodosProfesores(conexionBBDD):
@@ -297,6 +330,9 @@ def mostrarTodosProfesores(conexionBBDD):
         cursor=conexionBBDD.cursor()
         cursor.execute("SELECT * FROM Profesores")
         filas = cursor.fetchall()
+        
+        if(len(filas)==0):
+            print("No hay profesores registrados")
         
         for f in filas:
             print("Id_Profesor:"+str(f[0])+"\n"
@@ -348,5 +384,4 @@ def menuProfesores(conexionBBDD):
             finMenuProfesor = True
             print("Regresando a Menu Principal. Fin Menu Profesores")
         else:
-            print("Opcion incorrecta")
-       
+            print("Opcion no valida")       

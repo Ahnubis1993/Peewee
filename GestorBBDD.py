@@ -71,6 +71,7 @@ def crearTablaProfesores(conexion):
             "Nombre VARCHAR(25),"
             "Direccion VARCHAR(25),"
             "Telefono VARCHAR(9))")
+        cursor.execute("CREATE UNIQUE INDEX idx_dni ON Profesores (Dni)")
         conexion.commit()
         cursor.close()
     except:
