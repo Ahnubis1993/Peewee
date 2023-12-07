@@ -9,7 +9,7 @@ crearTablas(conexionBBDD)
 
 finMenuPrincipal = False
 
-while(finMenuPrincipal is False):
+while(not finMenuPrincipal):
     print("--- Menu Principal ---")
     print("1 - Gestion Alumnos")
     print("2 - Gestion Profesores")
