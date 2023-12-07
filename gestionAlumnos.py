@@ -10,11 +10,11 @@ def insertarAlumno(conexionBBDD):
     
     while(not correcto and intentos>0):
         expediente = input("Introduce el Numero de Expediente: ").strip()
-        if(expediente != ""): 
+        if(expediente.isdigit()): 
             correcto = True   
             print("Expediente valido")
         else:
-            print("El expediente no puede estar vacio")
+            print("El expediente debe ser un numero")
         intentos -= 1 
     
     if (correcto):
@@ -133,7 +133,112 @@ def eliminarAlumno(conexionBBDD):
         print("No hay resultados de busqueda. Fin de baja de alumno")
     
 def modificarAlumno(conexionBBDD):
-    print("SQL UPDATE") 
+    cursor = conexionBBDD.cursor()
+    print("--- Modificacion Profesor ---")
+    
+    numExpediente = busquedaAlumno(conexionBBDD)
+    
+    finModificacion = False
+    
+    if(numExpediente != -1):
+        while(not finModificacion): 
+            opcion = menuAtributos()
+            if(opcion == "1"):
+                nuevoNumExpediente = input("Introduce el nuevo Numero de Expediente: ").strip()
+                if (nuevoNumExpediente.isdigit()):
+                    try:
+                        if(confirmacion("Estas seguro de que deseas modificar el numero de expediente? (S/N): ")):
+                            cursor.execute("UPDATE Alumnos SET Num_Expediente=%s WHERE Num_Expediente=%s", (nuevoNumExpediente, numExpediente))
+                            conexionBBDD.commit()
+                            print("El numero de expediente ha sido modificado correctamente")
+                        else:
+                            print("Has cancelado la modificacion")
+                    except Exception as e:#FIXME Simplemente hay que comprobar que tipo de IntegrityError es la que se ha producido
+                        print("El numero de expediente no se ha podido modificar correctamente")
+            elif(opcion == "2"):
+                nuevoNombre = input("Introduce el nuevo nombre: ").strip()
+                if(nuevoNombre!= ""):
+                    try:
+                        if(confirmacion("Estas seguro de que deseas modificar el nombre? (S/N): ")):
+                            cursor.execute("UPDATE Alumnos SET Nombre=%s WHERE Num_Expediente=%s", (nuevoNombre, numExpediente))
+                            conexionBBDD.commit()
+                            print("El nombre ha sido modificado correctamente")
+                        else:
+                            print("Has cancelado la modificacion")
+                    except Exception as e:
+                        if "Duplicate entry" in str(e):
+                            print("Ya existe un alumno con el mismo nombre y apellidos.")
+                else:
+                    print("El nombre no puede estar vacio")
+            elif(opcion == "3"):
+                nuevosApellidos = input("Introduce los nuevos apellidos: ").strip()
+                if(nuevosApellidos!= ""):
+                    try:
+                        if(confirmacion("Estas seguro de que deseas modificar los apellidos? (S/N): ")):
+                            cursor.execute("UPDATE Alumnos SET Apellidos=%s WHERE Num_Expediente=%s", (nuevosApellidos, numExpediente))
+                            conexionBBDD.commit()
+                            print("Los apellidos han sido modificados correctamente")
+                        else:
+                            print("Has cancelado la modificacion")
+                    except Exception as e:
+                        if "Duplicate entry" in str(e):
+                            print("Ya existe un alumno con el mismo nombre y apellidos.")
+                else:
+                    print("Los apellidos no pueden estar vacios")
+            elif(opcion == "4"):
+                nuevoTelefono = input("Introduce el nuevo telefono: ").strip()
+                if(nuevoTelefono.isdigit() and len(nuevoTelefono)==9):
+                    try:
+                        if(confirmacion("Estas seguro de que deseas modificar el telefono? (S/N): ")):
+                            cursor.execute("UPDATE Alumnos SET Telefono=%s WHERE Num_Expediente=%s", (nuevoTelefono, numExpediente))
+                            conexionBBDD.commit()
+                            print("El telefono ha sido modificado correctamente")
+                        else:
+                            print("Has cancelado la modificacion")
+                    except:
+                        print("El telefono no se ha podido modificar correctamente")
+                else:
+                    print("El telefono debe tener 9 digitos")
+            elif(opcion == "5"):
+                nuevaDireccion = input("Introduce la nueva direccion: ").strip()
+                if(nuevaDireccion!= ""):
+                    try:
+                        if(confirmacion("Estas seguro de que deseas modificar la direccion? (S/N): ")):
+                            cursor.execute("UPDATE Alumnos SET Direccion=%s WHERE Num_Expediente=%s", (nuevaDireccion, numExpediente))
+                            conexionBBDD.commit()
+                            print("La direccion ha sido modificada correctamente")
+                        else:
+                            print("Has cancelado la modificacion")
+                    except:
+                        print("La direccion no se ha podido modificar correctamente")
+                else:
+                    print("La direccion no puede estar vacia")
+            elif(opcion == "6"):
+                nuevaFechaNac = input("Introduce la nueva fecha de nacimiento (yyyy-mm-dd): ").strip()
+                if("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", nuevaFechaNac):
+                    try:
+                        if(confirmacion("Estas seguro de que deseas modificar la fecha de nacimiento? (S/N): ")):
+                            cursor.execute("UPDATE Alumnos SET Fecha_Nacimiento=%s WHERE Num_Expediente=%s", (nuevaFechaNac, numExpediente))
+                            conexionBBDD.commit()
+                            print("La fecha de nacimiento ha sido modificada correctamente")
+                        else:
+                            print("Has cancelado la modificacion")
+                    except Exception as e:
+                        if "Incorrect date value" in str(e):
+                            print("La fecha de nacimiento no es correcta. Debe ser yyyy-mm-dd")
+                else:
+                    print("La fecha de nacimiento no es correcta. Debe ser yyyy-mm-dd")
+                
+            elif(opcion=="0"):
+                finModificacion = True
+                print("Fin de modificacion de alumno")
+            else:
+                print("Opcion no valida")
+                
+                #TODO hay que ver como se captura para pedir al USU si quieres volver a modificar
+    else:
+        print("No hay resultados de busqueda. Fin de modificacion de alumno")
+    cursor.close()
     
 def busquedaAlumno(conexionBBDD, alumnoUnico = False):
     print("--- Busqueda Alumno ---")
@@ -146,14 +251,14 @@ def busquedaAlumno(conexionBBDD, alumnoUnico = False):
         
         if (opcion == "1"):
             expediente = input("Introduce el Numero de Expediente a buscar: ").strip()
-            if (expediente != ""):
+            if (expediente.isdigit()):
                 try:
                     cursor = conexionBBDD.cursor()
                     cursor.execute("SELECT * FROM Alumnos WHERE Num_Expediente='" + expediente +"'")
                 except:
                     print("Consulta por Numero de Expediente no valida")
             else:
-                print("No puedes buscar por un Numero de Expediente vacio")
+                print("Debes buscar por un numero")
                 
         elif (opcion == "2"):
             nombre = input("Introduce el Nombre a buscar: ").strip()
