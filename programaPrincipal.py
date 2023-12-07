@@ -1,7 +1,7 @@
 from GestionAlumnos import menuAlumnos
 from GestionCursos import menuCursos
 from GestionProfesores import menuProfesores
-from GestorBBD import conectar, crearTablas
+from GestorBBDD import conectar, crearTablas
 
 
 conexionBBDD = conectar()

@@ -88,6 +88,7 @@ def crearTablaAlumnos(conexion):
             # Formato fecha dd/mm/yyyy
             "Fecha_Nacimiento DATE)"
             )
+        cursor.execute("CREATE UNIQUE INDEX idx_nombre_apellidos ON Alumnos (Nombre, Apellidos)")#Para asegurarse de que no hay dos alumnos con el mismo nombre y apellidos
         conexion.commit()
         cursor.close()
     except:
@@ -105,7 +106,39 @@ def crearTablaCursos(conexion):
     except:
         print("Tabla Cursos no creada correctamente")
         
+def crearTablaAlumnosCursos(conexion):
+    try:
+        cursor = conexion.cursor()
+        cursor.execute("CREATE TABLE IF NOT EXISTS Alumnos_Cursos("
+            "Num_Expediente INT,"
+            "Id_Curso INT,"
+            "FOREIGN KEY (Num_Expediente) REFERENCES Alumnos(Num_Expediente) ON DELETE CASCADE ON UPDATE CASCADE,"
+            "FOREIGN KEY (Id_Curso) REFERENCES Cursos(Codigo) ON DELETE CASCADE ON UPDATE CASCADE,"
+            "PRIMARY KEY (Num_Expediente,Id_Curso))")
+        conexion.commit()
+        cursor.close()
+    except:
+        print("Tabla Alumnos_Cursos no creada correctamente")
+        
+def crearTablaProfesoresCursos(conexion):
+    try:
+        cursor = conexion.cursor()
+        cursor.execute("CREATE TABLE IF NOT EXISTS Profesores_Cursos("
+            "Id_Profesor INT,"
+            "Id_Curso INT,"
+            "FOREIGN KEY (Id_Profesor) REFERENCES Profesores(Id) ON DELETE CASCADE ON UPDATE CASCADE,"
+            "FOREIGN KEY (Id_Curso) REFERENCES Cursos(Codigo) ON DELETE CASCADE ON UPDATE CASCADE,"
+            "PRIMARY KEY (Id_Profesor,Id_Curso))")
+        conexion.commit()
+        cursor.close()
+    except:
+        print("Tabla Profesores_Cursos no creada correctamente")
+        
+
+
 def crearTablas(conexion):
     crearTablaAlumnos(conexion)
     crearTablaProfesores(conexion)
     crearTablaCursos(conexion)
+    crearTablaAlumnosCursos(conexion)
+    crearTablaProfesoresCursos(conexion)

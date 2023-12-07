@@ -1,4 +1,5 @@
 from Utilidades import confirmacion
+from pymysql import IntegrityError
 import re
 
 def insertarAlumno(conexionBBDD):
@@ -34,7 +35,7 @@ def insertarAlumno(conexionBBDD):
         intentos = 5
         
         while(not correcto and intentos>0):
-            apellidos = input("Introduce ellos apellidos: ").strip()
+            apellidos = input("Introduce los apellidos: ").strip()
             if(nombre != ""): 
                 correcto = True   
                 print("Apellidos validos")
@@ -73,29 +74,39 @@ def insertarAlumno(conexionBBDD):
         intentos = 5
         
         while(not correcto and intentos>0):
-            fechaNac = input("Introduce la fecha de nacimiento (dd/mm/yyyy): ").strip()
+            fechaNac = input("Introduce la fecha de nacimiento (yyyy-mm-dd): ").strip()
             
-            if re.match("^[0-9]{2}/[0-9]{2}/[0-9]{4}$", fechaNac):
+            if re.match("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", fechaNac):
                 correcto = True   
                 print("Fecha valida")
             else:
-                print("El formato de la fecha no es correcto. Debe ser dd/mm/yyyy")
+                print("El formato de la fecha no es correcto. Debe ser yyyy-mm-dd")
             intentos -= 1    
     
                       
     if (correcto):
         try:
             cursor = conexionBBDD.cursor()
-            cursor.execute("INSERT INTO Alumnos (Num_Expediente, nombre, apellidos, telefono, direccion, FechaNacimiento) VALUES (%s, %s, %s, %s, %s, %s)", 
+            cursor.execute("INSERT INTO Alumnos (Num_Expediente, nombre, apellidos, telefono, direccion, Fecha_Nacimiento) VALUES (%s, %s, %s, %s, %s, %s)", 
                            (expediente, nombre, apellidos, telefono, direccion, fechaNac))
             conexionBBDD.commit()
-            if(not confirmacion("Alta realizada correctamente. Deseas introducir otro alumno?")):
+            if(not confirmacion("Alta realizada correctamente. Deseas introducir otro alumno? (S/N): ")):
                 correcto = True
             print("Fin de alta de alumno")
             
-        except:
-            #TODO recibir el error de la base de datos
-            print("Alumno no dado de alta, fallo al introducir el alumno en la base de datos")
+        except IntegrityError as e:
+            # Capturar error de integridad de la base de datos
+            
+            if "Duplicate entry" in str(e):
+                print("Ya existe un alumno con el mismo nombre y apellidos.")
+            elif "Incorrect date value" in str(e):
+                print("La fecha de nacimiento no es correcta. Debe ser yyyy-mm-dd")
+            else:
+                print("Error al introducir el alumno en la base de datos")
+                
+        except Exception as e:
+            print(f"Alumno no dado de alta, fallo al introducir el alumno en la base de datos\n {e}")
+            
         finally:
             if (cursor is not None):
                 cursor.close()
@@ -189,16 +200,16 @@ def busquedaAlumno(conexionBBDD, alumnoUnico = False):
                 print("No puedes buscar por una direccion vacia")
                 
         elif (opcion == "6"):
-            fechaNac = input("Introduce la fecha de nacimiento a buscar (dd/mm/yyyy): ").strip()
+            fechaNac = input("Introduce la fecha de nacimiento a buscar (yyyy-mm-dd): ").strip()
             
-            if re.match("^[0-9]{2}/[0-9]{2}/[0-9]{4}$", fechaNac):
+            if re.match("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", fechaNac):
                 try:
                     cursor = conexionBBDD.cursor()
-                    cursor.execute("SELECT * FROM Alumnos WHERE FechaNacimiento='"+fechaNac+"'")
+                    cursor.execute("SELECT * FROM Alumnos WHERE Fecha_Nacimiento='"+fechaNac+"'")
                 except:
                     print("Consulta por Fecha de Nacimiento no valida")
             else:
-                print("El formato de la fecha no es correcto. Debe ser dd/mm/yyyy")
+                print("El formato de la fecha no es correcto. Debe ser yyyy-mm-dd")
         
         elif(opcion=="0"):
             finBusqueda = True
@@ -212,13 +223,13 @@ def busquedaAlumno(conexionBBDD, alumnoUnico = False):
             cursor.close()
             
             for f in filas:
-                print("-"*32+"\n"
-                      "Numero de expediente:"+str(f[0])+"\n"
+                print("Numero de expediente:"+str(f[0])+"\n"
                       "Nombre:"+f[1]+"\n"
                       "Apellidos:"+f[2]+"\n"
                       "Telefono:"+f[3]+"\n"
                       "Direccion:"+f[4]+"\n"
-                      "Fecha de Nacimiento:"+str(f[5])+"\n")
+                      "Fecha de Nacimiento:"+str(f[5])+"\n"
+                      "--------------------------------\n")
             
             if(len(filas)>1 and alumnoUnico):
                 finAlumnoUnico = False
@@ -227,21 +238,38 @@ def busquedaAlumno(conexionBBDD, alumnoUnico = False):
                     if(expediente.isdigit()):
                         numExpedienteEncontrado = [fila for fila in filas if(fila[0]==int(expediente))]
                         if(numExpedienteEncontrado):
-                            finBusqueda = True #TODO revisar esta condicion de salida
+                            finBusqueda = True
                             numExpediente = numExpedienteEncontrado[0]
                     else:
                         print("Tienes que insertar un numero")
             elif(len(filas)==1):
                 finBusqueda = True
                 numExpediente = filas[0][0]
-                
             else:
                 if(not confirmacion("No se han encontrado resultados. Deseas buscar de nuevo? (S/N): ")):
                     finBusqueda = True
     return numExpediente
 
-def mostrarTodosAlumnos():
-    print("SQL SELECT")
+def mostrarTodos(conexionBBDD):
+    print("--- Mostrando todos los alumnos ---")
+    try:
+        cursor=conexionBBDD.cursor()
+        cursor.execute("SELECT * FROM Alumnos")
+        filas = cursor.fetchall()
+        
+        if (len(filas)==0):
+            print("No hay alumnos registrados")
+        
+        for f in filas:
+                print("Numero de expediente:"+str(f[0])+"\n"
+                      "Nombre:"+f[1]+"\n"
+                      "Apellidos:"+f[2]+"\n"
+                      "Telefono:"+f[3]+"\n"
+                      "Direccion:"+f[4]+"\n"
+                      "Fecha de Nacimiento:"+str(f[5])+"\n"
+                      "--------------------------------\n")
+    except:
+        print("No se han podido mostrar todos los alumnos")
     
 def menuAtributos(): 
     fin = False
@@ -278,15 +306,15 @@ def menuAlumnos(conexionBBDD):
         opcion = input("Introduce una Opcion: ").strip()
         
         if(opcion=="1"):
-            insertarAlumno()
+            insertarAlumno(conexionBBDD)
         elif(opcion=="2"):
-            eliminarAlumno()
+            eliminarAlumno(conexionBBDD)
         elif(opcion=="3"):
-            busquedaAlumno()
+            busquedaAlumno(conexionBBDD)
         elif(opcion=="4"):
-            busquedaAlumno()
+            busquedaAlumno(conexionBBDD)
         elif(opcion=="5"):
-            mostrarTodosAlumnos()
+            mostrarTodos(conexionBBDD)
         elif(opcion=="0"):
             finMenuAlumno = True
             print("Regresando a Menu Principal. Fin Menu Alumnos")
