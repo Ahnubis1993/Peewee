@@ -80,10 +80,10 @@ def crearTablaAlumnos(conexion):
     try:
         cursor = conexion.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS Alumnos("
-            "Num_Expediente INT AUTO_INCREMENT PRIMARY KEY," 
+            "Num_Expediente INT PRIMARY KEY," 
             "Nombre VARCHAR(25),"
             "Apellidos VARCHAR(25),"
-            "Telefono INT(9),"
+            "Telefono VARCHAR(9),"
             "Direccion VARCHAR(25),"
             # Formato fecha dd/mm/yyyy
             "Fecha_Nacimiento DATE)"
