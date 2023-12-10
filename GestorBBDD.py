@@ -67,73 +67,73 @@ def crearTablaProfesores(conexion):
         cursor = conexion.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS Profesores("
             "Id INT AUTO_INCREMENT PRIMARY KEY,"
-            "Dni VARCHAR(9)," 
-            "Nombre VARCHAR(25),"
-            "Direccion VARCHAR(25),"
-            "Telefono VARCHAR(9))")
-        cursor.execute("CREATE UNIQUE INDEX idx_dni ON Profesores (Dni)")
+            "Dni VARCHAR(9) NOT NULL," 
+            "Nombre VARCHAR(25) NOT NULL,"
+            "Direccion VARCHAR(25) NOT NULL,"
+            "Telefono VARCHAR(9) NOT NULL)")
+        cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_dni ON Profesores (Dni)")
         conexion.commit()
         cursor.close()
-    except:
-        print("Tabla Profesores no creada correctamente")
+    except Exception as e:
+        print("Tabla Profesores no creada correctamente: "+str(e))
     
 def crearTablaAlumnos(conexion):
     try:
         cursor = conexion.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS Alumnos("
             "Num_Expediente INT PRIMARY KEY," 
-            "Nombre VARCHAR(25),"
-            "Apellidos VARCHAR(25),"
-            "Telefono VARCHAR(9),"
-            "Direccion VARCHAR(25),"
+            "Nombre VARCHAR(25) NOT NULL,"
+            "Apellidos VARCHAR(25) NOT NULL,"
+            "Telefono VARCHAR(9) NOT NULL,"
+            "Direccion VARCHAR(25) NOT NULL,"
             # Formato fecha dd/mm/yyyy
-            "Fecha_Nacimiento DATE)"
+            "Fecha_Nacimiento DATE NOT NULL)"
             )
-        cursor.execute("CREATE UNIQUE INDEX idx_nombre_apellidos ON Alumnos (Nombre, Apellidos)")#Para asegurarse de que no hay dos alumnos con el mismo nombre y apellidos
+        cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_nombre_apellidos ON Alumnos (Nombre, Apellidos)")#Para asegurarse de que no hay dos alumnos con el mismo nombre y apellidos
         conexion.commit()
         cursor.close()
-    except:
-        print("Tabla Alumnos no creada correctamente")
+    except Exception as e:
+        print("Tabla Alumnos no creada correctamente: "+str(e))
     
 def crearTablaCursos(conexion):
     try:
         cursor = conexion.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS Cursos("
             "Codigo INT AUTO_INCREMENT PRIMARY KEY," 
-            "Nombre VARCHAR(25),"
-            "Descripcion VARCHAR(25))")
+            "Nombre VARCHAR(25) NOT NULL,"
+            "Descripcion VARCHAR(25) NOT NULL)")
         conexion.commit()
         cursor.close() 
-    except:
-        print("Tabla Cursos no creada correctamente")
+    except Exception as e:
+        print("Tabla Cursos no creada correctamente: "+str(e))
         
 def crearTablaAlumnosCursos(conexion):
     try:
         cursor = conexion.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS Alumnos_Cursos("
-            "Num_Expediente INT,"
-            "Id_Curso INT,"
+            "Num_Expediente INT NOT NULL,"
+            "Id_Curso INT NOT NULL,"
             "FOREIGN KEY (Num_Expediente) REFERENCES Alumnos(Num_Expediente) ON DELETE CASCADE ON UPDATE CASCADE,"
             "FOREIGN KEY (Id_Curso) REFERENCES Cursos(Codigo) ON DELETE CASCADE ON UPDATE CASCADE,"
             "PRIMARY KEY (Num_Expediente,Id_Curso))")
         conexion.commit()
         cursor.close()
-    except:
-        print("Tabla Alumnos_Cursos no creada correctamente")
+    except Exception as e:
+        print("Tabla Alumnos_Cursos no creada correctamente: " + str(e))
         
 def crearTablaProfesoresCursos(conexion):
     try:
         cursor = conexion.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS Profesores_Cursos("
-            "Id_Profesor INT,"
-            "Id_Curso INT,"
+            "Id_Profesor INT NOT NULL,"
+            "Id_Curso INT NOT NULL,"
             "FOREIGN KEY (Id_Profesor) REFERENCES Profesores(Id) ON DELETE CASCADE ON UPDATE CASCADE,"
             "FOREIGN KEY (Id_Curso) REFERENCES Cursos(Codigo) ON DELETE CASCADE ON UPDATE CASCADE,"
             "PRIMARY KEY (Id_Profesor,Id_Curso))")
         conexion.commit()
         cursor.close()
-    except:
-        print("Tabla Profesores_Cursos no creada correctamente")
+    except Exception as e:
+        print("Tabla Profesores_Cursos no creada correctamente: " + str(e))
         
 
 

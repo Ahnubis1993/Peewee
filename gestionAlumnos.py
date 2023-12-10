@@ -3,141 +3,143 @@ from pymysql import IntegrityError
 import re
 
 def insertarAlumno(conexionBBDD):
-    print("--- Alta Alumno ---")
-    
-    intentos = 5
-    correcto = False
-    
-    while(not correcto and intentos>0):
-        expediente = input("Introduce el Numero de Expediente: ").strip()
-        if(expediente.isdigit()): 
-            correcto = True   
-            print("Expediente valido")
-        else:
-            print("El expediente debe ser un numero")
-        intentos -= 1 
-    
-    if (correcto):
-        correcto = False
+    fin = False
+    while(not fin):
+        print("--- Alta Alumno ---")
+        
         intentos = 5
+        correcto = False
         
         while(not correcto and intentos>0):
-            nombre = input("Introduce el nombre: ").strip()
-            if(nombre != ""): 
+            expediente = input("Introduce el Numero de Expediente: ").strip()
+            if(expediente.isdigit()): 
                 correcto = True   
-                print("Nombre valido")
+                print("Expediente valido")
             else:
-                print("El nombre no puede estar vacio")
+                print("El expediente debe ser un numero")
             intentos -= 1 
-
-    if (correcto):
-        correcto = False
-        intentos = 5
         
-        while(not correcto and intentos>0):
-            apellidos = input("Introduce los apellidos: ").strip()
-            if(nombre != ""): 
-                correcto = True   
-                print("Apellidos validos")
-            else:
-                print("Los apellidos no pueden estar vacios")
-            intentos -= 1 
-
-    if (correcto):
-        correcto = False
-        intentos = 5
-        
-        while(not correcto and intentos>0):
-            telefono = input("Introduce el telefono: ").strip()
-            if(telefono.isdigit() and len(telefono)==9): 
-                correcto = True   
-                print("Telefono valido")
-            else:
-                print("Telefono no valido. Deben ser 9 digitos sin espacios.")
-            intentos -= 1 
-
-    if (correcto):
-        correcto = False
-        intentos = 5
-        
-        while(not correcto and intentos>0):
-            direccion = input("Introduce la direccion: ").strip()
-            if(direccion != ""): 
-                correcto = True   
-                print("Direccion valida")
-            else:
-                print("La direccion no puede estar vacia")
-            intentos -= 1    
-
-    if (correcto):
-        correcto = False
-        intentos = 5
-        
-        while(not correcto and intentos>0):
-            fechaNac = input("Introduce la fecha de nacimiento (yyyy-mm-dd): ").strip()
+        if (correcto):
+            correcto = False
+            intentos = 5
             
-            if re.match("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", fechaNac):
-                correcto = True   
-                print("Fecha valida")
-            else:
-                print("El formato de la fecha no es correcto. Debe ser yyyy-mm-dd")
-            intentos -= 1    
-    
-                      
-    if (correcto):
-        try:
-            cursor = conexionBBDD.cursor()
-            cursor.execute("INSERT INTO Alumnos (Num_Expediente, nombre, apellidos, telefono, direccion, Fecha_Nacimiento) VALUES (%s, %s, %s, %s, %s, %s)", 
-                           (expediente, nombre, apellidos, telefono, direccion, fechaNac))
-            conexionBBDD.commit()
-            if(not confirmacion("Alta realizada correctamente. Deseas introducir otro alumno? (S/N): ")):
-                correcto = True
-            print("Fin de alta de alumno")
+            while(not correcto and intentos>0):
+                nombre = input("Introduce el nombre: ").strip()
+                if(nombre != ""): 
+                    correcto = True   
+                    print("Nombre valido")
+                else:
+                    print("El nombre no puede estar vacio")
+                intentos -= 1 
+
+        if (correcto):
+            correcto = False
+            intentos = 5
             
-        except IntegrityError as e:
-            # Capturar error de integridad de la base de datos
+            while(not correcto and intentos>0):
+                apellidos = input("Introduce los apellidos: ").strip()
+                if(nombre != ""): 
+                    correcto = True   
+                    print("Apellidos validos")
+                else:
+                    print("Los apellidos no pueden estar vacios")
+                intentos -= 1 
+
+        if (correcto):
+            correcto = False
+            intentos = 5
             
-            if "Duplicate entry" in str(e):
-                print("Ya existe un alumno con el mismo nombre y apellidos.")
-            elif "Incorrect date value" in str(e):
-                print("La fecha de nacimiento no es correcta. Debe ser yyyy-mm-dd")
-            else:
-                print("Error al introducir el alumno en la base de datos")
+            while(not correcto and intentos>0):
+                telefono = input("Introduce el telefono: ").strip()
+                if(telefono.isdigit() and len(telefono)==9): 
+                    correcto = True   
+                    print("Telefono valido")
+                else:
+                    print("Telefono no valido. Deben ser 9 digitos sin espacios.")
+                intentos -= 1 
+
+        if (correcto):
+            correcto = False
+            intentos = 5
+            
+            while(not correcto and intentos>0):
+                direccion = input("Introduce la direccion: ").strip()
+                if(direccion != ""): 
+                    correcto = True   
+                    print("Direccion valida")
+                else:
+                    print("La direccion no puede estar vacia")
+                intentos -= 1    
+
+        if (correcto):
+            correcto = False
+            intentos = 5
+            
+            while(not correcto and intentos>0):
+                fechaNac = input("Introduce la fecha de nacimiento (yyyy-mm-dd): ").strip()
                 
-        except Exception as e:
-            print(f"Alumno no dado de alta, fallo al introducir el alumno en la base de datos\n {e}")
+                if re.match("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", fechaNac):
+                    correcto = True   
+                    print("Fecha valida")
+                else:
+                    print("El formato de la fecha no es correcto. Debe ser yyyy-mm-dd")
+                intentos -= 1    
+        
+                        
+        if (correcto):
+            try:
+                cursor = conexionBBDD.cursor()
+                cursor.execute("INSERT INTO Alumnos (Num_Expediente, nombre, apellidos, telefono, direccion, Fecha_Nacimiento) VALUES (%s, %s, %s, %s, %s, %s)", 
+                            (expediente, nombre, apellidos, telefono, direccion, fechaNac))
+                conexionBBDD.commit()
+                print("Alta realizada correctamente.")
+                
+            except IntegrityError as e:
+                # Capturar error de integridad de la base de datos
+                correcto = False
+                if "Duplicate entry" in str(e):
+                    print("Ya existe un alumno con el mismo nombre y apellidos.")
+                elif "Incorrect date value" in str(e):
+                    print("La fecha de nacimiento no es correcta. Debe ser yyyy-mm-dd")
+                else:
+                    print("Error al introducir el alumno en la base de datos")
+                    
+            except Exception as e:
+                correcto = False
+                print(f"Alumno no dado de alta, fallo al introducir el alumno en la base de datos\n {e}")
+                
+            finally:
+                if (cursor is not None):
+                    cursor.close()
+        else:
+            print("Has intriducido el dato mal 5 veces. Alta cancelada.")
             
-        finally:
-            if (cursor is not None):
-                cursor.close()
-
-    else:
-        if(not confirmacion("No se ha realizado el alta. Deseas introducir otro alumno? (S/N): ")):
-            correcto = True
+        if(not confirmacion("Deseas introducir otro alumno? (S/N): ")):
+            fin = True
             print("Fin de alta de alumno")
 
 def eliminarAlumno(conexionBBDD):
     print("--- Baja Alumno ---")
     expediente = busquedaAlumno(conexionBBDD)
     if(expediente != -1):
-        try:
-            cursor = conexionBBDD.cursor()
-            cursor.execute("DELETE FROM Alumnos WHERE Num_Expediente=%s",(expediente))
-            print("Alumno eliminado correctamente\n")
-            conexionBBDD.commit()
-        except:
-            print("Error al eliminar el alumno de la base de datos")
-        finally:
-            cursor.close()
+        if (confirmacion("Estas seguro de que deseas eliminar el alumno con numero de expediente '"+expediente+"'? (S/N)")):
+            try:
+                cursor = conexionBBDD.cursor()
+                cursor.execute("DELETE FROM Alumnos WHERE Num_Expediente=%s",(expediente))
+                print("Alumno eliminado correctamente\n")
+                conexionBBDD.commit()
+            except:
+                print("Error al eliminar el alumno de la base de datos")
+            finally:
+                cursor.close()
     else:
         print("No hay resultados de busqueda. Fin de baja de alumno")
     
 def modificarAlumno(conexionBBDD):
     cursor = conexionBBDD.cursor()
-    print("--- Modificacion Profesor ---")
+    print("--- Modificacion Alumno ---")
     
-    numExpediente = busquedaAlumno(conexionBBDD)
-    
+    numExpediente = busquedaAlumno(conexionBBDD, True)
     finModificacion = False
     
     if(numExpediente != -1):
@@ -235,7 +237,9 @@ def modificarAlumno(conexionBBDD):
             else:
                 print("Opcion no valida")
                 
-                #TODO hay que ver como se captura para pedir al USU si quieres volver a modificar
+            if(not finModificacion and not confirmacion("Deseas modificar otro atributo de este alumno? (S/N): ")):
+                finModificacion = True
+            #TODO hay que ver como se captura para pedir al USU si quieres volver a modificar
     else:
         print("No hay resultados de busqueda. Fin de modificacion de alumno")
     cursor.close()
@@ -350,7 +354,7 @@ def busquedaAlumno(conexionBBDD, alumnoUnico = False):
             elif(len(filas)==1):
                 finBusqueda = True
                 numExpediente = filas[0][0]
-            else:
+            elif (len(filas)==0):
                 if(not confirmacion("No se han encontrado resultados. Deseas buscar de nuevo? (S/N): ")):
                     finBusqueda = True
     return numExpediente
@@ -415,13 +419,13 @@ def menuAlumnos(conexionBBDD):
         elif(opcion=="2"):
             eliminarAlumno(conexionBBDD)
         elif(opcion=="3"):
-            busquedaAlumno(conexionBBDD)
+            modificarAlumno(conexionBBDD)
         elif(opcion=="4"):
             busquedaAlumno(conexionBBDD)
         elif(opcion=="5"):
             mostrarTodos(conexionBBDD)
         elif(opcion=="0"):
             finMenuAlumno = True
-            print("Regresando a Menu Principal. Fin Menu Alumnos")
+            print("Regresando a Menu Principal")
         else:
             print("Opcion incorrecta")
