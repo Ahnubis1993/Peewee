@@ -10,14 +10,13 @@ def insertarCurso(conexionBBDD):
 
     :param parametro1: conexion a bbdd
     """
-    
-    print("--- Alta Curso ---")
-    
-    correcto = False
-    intentos = 5
-    
-    while(not correcto):
-    
+    fin = False
+    while(not fin):
+        print("--- Alta Curso ---")
+        
+        correcto = False
+        intentos = 5
+        
         while(not correcto and intentos>0):
             nombreCurso = input("Introduce nombre del curso: ").strip()
             if(nombreCurso != ""):
@@ -42,26 +41,24 @@ def insertarCurso(conexionBBDD):
                 intentos -= 1
         
         if(correcto):
-            correcto = False
             try:
                 cursor = conexionBBDD.cursor()
                 cursor.execute("INSERT INTO Cursos (nombre, descripcion) VALUES (%s, %s)",
                             (nombreCurso, descripcionCurso))
                 conexionBBDD.commit()
-                if(not confirmacion("El alta del curso se ha realizado correctamente. Deseas introducir otro curso? (S/N): ")):
-                    correcto = True
-                    print("Fin alta Curso")
+                print("Alta realizada correctamente")
                 
             except:
-                print("Curso no se ha dado de alta")
+                print("Error al introducir el curso en la base de datos")
             finally:
-                cursor.close()
-                
+                if (cursor is not None):
+                    cursor.close()
         else:
-            correcto = False
-            if(not confirmacion("No se ha realizado el alta correctamente. Deseas introducir un curso? (S/N): ")):
-                correcto = True
-                print("Fin alta Curso")
+            print("Has introducido el dato mal 5 veces. Alta cancelada.")
+            
+        if(not confirmacion("No se ha realizado el alta correctamente. Deseas introducir un curso? (S/N): ")):
+            fin = True
+            print("Fin alta Curso")
     
 
 def eliminarCursor(conexionBBDD):

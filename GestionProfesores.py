@@ -13,12 +13,13 @@ def insertarProfesor(conexionBBDD):
     :param parametro1: conexion a bbdd
     """
     
-    print("--- Alta Profesor ---")
     
-    intentos = 5
-    correcto = False
+    fin = False
+    while (not fin):
+        print("--- Alta Profesor ---")
     
-    while(not correcto):
+        intentos = 5
+        correcto = False
     
         while(not correcto and intentos>0):
             dniProfesor = input("Introduce el dni del profesor: ").strip()
@@ -70,23 +71,18 @@ def insertarProfesor(conexionBBDD):
             
             
         if(correcto):
-            # se pone a false porque viene true, para poder ingresar otro profesor
-            correcto = False   
             try:
                 cursor = conexionBBDD.cursor()
                 cursor.execute("INSERT INTO Profesores (dni, nombre, direccion, telefono) VALUES (%s, %s, %s, %s)",
                             (dniProfesor.upper(), nombreProfesor, direccionProfesor, telefonoProfesor))
                 conexionBBDD.commit()
-                
-                if(not confirmacion("El alta del profesor se ha realizado correctamente. Deseas introducir otro profesor? (S/N): ")):
-                    correcto = True
-                    print("Fin alta Profesor")
+                print("Alta realizada correctamente")
                     
             except IntegrityError as e:
                 if "Dni_UNIQUE" in str(e):
-                    print("Ya existe un profesor con mismo DNI.")
+                    print("Ya existe un profesor con el mismo DNI.")
                 else:
-                    print("Error al introducir el curso en la base de datos")
+                    print("Error al introducir el profesor en la base de datos")
             except Exception:
                 print("Profesor no dado de alta, fallo al introducir el profesor en la base de datos")
             finally: 
@@ -94,10 +90,11 @@ def insertarProfesor(conexionBBDD):
                     cursor.close()
 
         else:
-            correcto = False
-            if(not confirmacion("El alta del profesor no se ha realizado correctamente. Deseas introducir un profesor? (S/N): ")):
-                correcto = True
-                print("Fin alta Profesor")
+            print("Has introducido el dato mal 5 veces. Alta cancelada.")
+            
+        if(not confirmacion("Deseas introducir otro profesor? (S/N): ")):
+            fin = True
+            print("Fin de alta de Profesor")
             
 def eliminarProfesor(conexionBBDD):
     
