@@ -3,8 +3,6 @@ import pymysql
 def leerConfiguracion():
     
     """
-    Descripción corta de la función.
-
     Lee un fichero por lineas para buscar mlos datos que se insertan 
     en la configuracion del acceso a la bbddd
 

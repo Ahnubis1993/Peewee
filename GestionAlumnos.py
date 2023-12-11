@@ -3,6 +3,14 @@ from pymysql import IntegrityError
 import re
 
 def insertarAlumno(conexionBBDD):
+    
+    """
+    Da de alta un alumno, si alguno de los atributos a asignar falla 5 veces, no se crea el alumno 
+    y se pide si quieres dar de alta otro
+
+    :param parametro1: conexion a bbdd
+    """
+    
     fin = False
     while(not fin):
         print("--- Alta Alumno ---")
@@ -95,8 +103,11 @@ def insertarAlumno(conexionBBDD):
                 
             except IntegrityError as e:
                 # Captura error de integridad de la base de datos
-                if "Duplicate entry" in str(e):
-                    print("Ya existe un alumno con el mismo nombre y apellidos.")
+                if ("Duplicate entry" in str(e)):
+                    if ("idx_nombre_apellidos" in str(e)):
+                        print("Ya existe un alumno con el mismo nombre y apellidos.")
+                    else:
+                        print("Ya existe un alumno con el mismo numero de expediente.")
                 elif "Incorrect date value" in str(e):
                     print("La fecha de nacimiento no es correcta. Debe ser yyyy-mm-dd")
                 else:
@@ -116,6 +127,12 @@ def insertarAlumno(conexionBBDD):
             print("Fin de alta de alumno")
 
 def eliminarAlumno(conexionBBDD):
+    """
+    Elimina un alumno mediante el id que es buscado por el metodo busquedaAlumno
+    Se obtiene el expediente del mismo y se elimina de las correspondientes tablas en la que se encuentre
+
+    :param parametro1: conexion a bbdd
+    """
     print("--- Baja Alumno ---")
     expediente = busquedaAlumno(conexionBBDD)
     if(expediente != -1):
@@ -123,18 +140,26 @@ def eliminarAlumno(conexionBBDD):
             try:
                 cursor = conexionBBDD.cursor()
                 cursor.execute("DELETE FROM Alumnos WHERE Num_Expediente=%s",(expediente))
-                print("Alumno eliminado correctamente\n")
                 conexionBBDD.commit()
+                print("Alumno eliminado correctamente\n")
             except:
                 print("Error al eliminar el alumno de la base de datos")
             finally:
-                cursor.close()
+                if (cursor is not None):
+                    cursor.close()
         else:
-            print("Alumno con expediente "+str(expediente)+" no dado de baja")
+            print("Alumno con expediente '"+str(expediente)+"' no ha sido dado de baja")
     else:
         print("No hay resultados de busqueda. Fin de baja de alumno")
     
 def modificarAlumno(conexionBBDD):
+    
+    """
+    Modifica un alumno que es buscado, mediante el expediente del alumno, 
+    seleccionamos el atributo que se desee modificar siempre y cuando se acepte la confirmacion
+
+    :param parametro1: conexion a bbdd
+    """
     cursor = conexionBBDD.cursor()
     print("--- Modificacion Alumno ---")
     
@@ -243,6 +268,14 @@ def modificarAlumno(conexionBBDD):
     cursor.close()
     
 def busquedaAlumno(conexionBBDD, alumnoUnico = False):
+    
+    """
+    Busca un alumno mediante cualquier atributo del mismo, si es localizado se devuelve el expediente 
+    pera poder gestionarlo en otros metodos
+
+    :param parametro1: conexion a bbdd
+    """
+    
     print("--- Busqueda Alumno ---")
     
     numExpediente = -1
@@ -358,6 +391,13 @@ def busquedaAlumno(conexionBBDD, alumnoUnico = False):
     return numExpediente
 
 def mostrarTodos(conexionBBDD):
+    
+    """
+    Muestra todos los alumnos que haya en la tabla Alumnos
+
+    :param parametro1: conexion a bbdd
+    """
+    
     print("--- Mostrando todos los alumnos ---")
     try:
         cursor=conexionBBDD.cursor()
@@ -379,6 +419,13 @@ def mostrarTodos(conexionBBDD):
         print("No se han podido mostrar todos los alumnos")
     
 def menuAtributos(): 
+    
+    """
+    Menu de atributos del alumno entre los que se pueden elegir
+
+    :param parametro1: conexion a bbdd
+    """
+    
     fin = False
     while(not fin):
         print("Elige un atributo de los siguientes: ")
@@ -398,6 +445,13 @@ def menuAtributos():
     return opcion
 
 def menuAlumnos(conexionBBDD):
+    
+    """
+    Menu de alumnos donde se pueden elegir las diferentes operaciones de gestion relacionados con el mismo
+    Se pedira una opcion para entrar en alguno de los submenus, si insertas 0, sale al menuPrincipal
+
+    :param parametro1: conexion a bbdd
+    """
     
     finMenuAlumno = False
     

@@ -71,10 +71,8 @@ def insertarCurso(conexionBBDD):
 def eliminarCursor(conexionBBDD):
     
     """
-    Descripción corta de la función.
-
     Elimina un curso mediante el id que es buscado por el metodo busquedaCurso
-    Se obtiene el id del mismo y se elemina de las correspondientes tablas en la que se encuentre
+    Se obtiene el id del mismo y se elimina de las correspondientes tablas en la que se encuentre
 
     :param parametro1: conexion a bbdd
     """
@@ -82,29 +80,26 @@ def eliminarCursor(conexionBBDD):
     print("--- Baja Curso ---")
     codigoCurso = busquedaCurso(conexionBBDD)
     if(codigoCurso != -1):
-        try:
-            cursor = conexionBBDD.cursor()
-            if(confirmacion("Estas seguro de que deseas eliminar el curso con codigo "+codigoCurso+"? (S/N): ")):
+        if(confirmacion("Estas seguro de que deseas eliminar el curso con codigo '"+str(codigoCurso)+"'? (S/N): ")):
+            try:
+                cursor = conexionBBDD.cursor()
                 cursor.execute("DELETE FROM Cursos WHERE Codigo=%s",codigoCurso)
                 conexionBBDD.commit()
-                print("Curso con codigo "+codigoCurso+" ha sido dado de baja")
-            else:
-                print("Curso con codigo "+codigoCurso+" no ha sido dado de baja")
-           
-        except:
-            print("Consulta de borrado Curso no valida")
-        finally: 
-            if (cursor is not None):
-                cursor.close()
+                print("Curso con codigo '"+str(codigoCurso)+"' eliminado correctamente")
+            except:
+                print("Error al eliminar el curso de la base de datos")
+            finally: 
+                if (cursor is not None):
+                    cursor.close()
+        else:
+            print("Curso con codigo '"+str(codigoCurso)+"' no ha sido dado de baja")
     else:
         print("No hay resultados de busqueda. Fin baja Curso")
     
 def modificarCurso(conexionBBDD):
     
     """
-    Descripción corta de la función.
-
-    Modifica un curso mediante que es buscado por id en metodo busqueda, mediante el id
+    Modifica un curso que es buscado, mediante el id
     del curso, seleccionamos el atributo que se desee modificar siempre y cuando se acepte la confirmacion
 
     :param parametro1: conexion a bbdd
@@ -183,8 +178,6 @@ def modificarCurso(conexionBBDD):
 def busquedaCurso(conexionBBDD):
     
     """
-    Descripción corta de la función.
-
     Busca un curso mediante cualquier atributo del mismo, si es localizado se devuelve el id 
     pera poder gestionarlo en otros metodos
 
@@ -271,8 +264,6 @@ def busquedaCurso(conexionBBDD):
 def mostrarTodosCursos(conexionBBDD):
     
     """
-    Descripción corta de la función.
-
     Muestra todos los cursos que haya en la tabla Cursos
 
     :param parametro1: conexion a bbdd
@@ -303,10 +294,8 @@ def mostrarTodosCursos(conexionBBDD):
 def menuCursos(conexionBBDD):
     
     """
-    Descripción corta de la función.
-
     Menu de cursos donde se pueden elegir las diferentes operaciones de gestion relacionados con el mismo
-    Se pedir una opcion para entrar en alguno de los submenus, si insertas 0, sale al menuPrincipal
+    Se pedira una opcion para entrar en alguno de los submenus, si insertas 0, sale al menuPrincipal
 
     :param parametro1: conexion a bbdd
     """
@@ -336,6 +325,6 @@ def menuCursos(conexionBBDD):
             mostrarTodosCursos(conexionBBDD)
         elif(opcion=="0"):
             finMenuCurso = True
-            print("Regresando a Menu Principal. Fin Menu Cursos")
+            print("Regresando a Menu Principal")
         else:
             print("Opcion incorrecta")

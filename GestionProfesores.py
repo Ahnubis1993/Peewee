@@ -5,8 +5,6 @@ from pymysql import IntegrityError
 def insertarProfesor(conexionBBDD):
     
     """
-    Descripción corta de la función.
-
     Da de alta un profesor, si alguno de los atributos a asignar falla 5 veces, no se crea el profesor 
     y se pide si quieres dar de alta otro
 
@@ -99,10 +97,8 @@ def insertarProfesor(conexionBBDD):
 def eliminarProfesor(conexionBBDD):
     
     """
-    Descripción corta de la función.
-
     Elimina un profesor mediante el id que es buscado por el metodo busquedaProfesor
-    Se obtiene el id del mismo y se elemina de las correspondientes tablas en la que se encuentre
+    Se obtiene el id del mismo y se elimina de las correspondientes tablas en la que se encuentre
 
     :param parametro1: conexion a bbdd
     """
@@ -110,30 +106,26 @@ def eliminarProfesor(conexionBBDD):
     print("--- Baja Profesor ---")
     idProfesor = busquedaProfesor(conexionBBDD)
     if(idProfesor != -1):
-        try:
-            cursor = conexionBBDD.cursor()
-            if(confirmacion("Estas seguro de que deseas eliminar el profesor con id"+str(idProfesor)+"? (S/N): ")):
+        if(confirmacion("Estas seguro de que deseas eliminar el profesor con id '"+str(idProfesor)+"'? (S/N): ")):
+            try:
+                cursor = conexionBBDD.cursor()
                 cursor.execute("DELETE FROM Profesores WHERE Id=%s",(idProfesor))
                 conexionBBDD.commit()
                 print("Profesor con id "+str(idProfesor)+" ha sido dado de baja")
-            else:
-                print("Profesor con id "+str(idProfesor)+" no ha sido dado de baja")
-
-        except:
-            print("Consulta de borrado Profesor no valida")
-        finally:
-            if (cursor is not None):
-                cursor.close()
-            
+            except:
+                print("Error al eliminar el profesor de la base de datos")
+            finally:
+                if (cursor is not None):
+                    cursor.close()
+        else:
+            print("Profesor con id '"+str(idProfesor)+"' no ha sido dado de baja")
     else:
         print("No hay resultados de busqueda. Fin baja profesor")
     
 def modificarProfesor(conexionBBDD):
     
     """
-    Descripción corta de la función.
-
-    Modifica un profesor mediante que es buscado por id en metodo busqueda, mediante el id
+    Modifica un profesor que es buscado, mediante el id
     del profesor, seleccionamos el atributo que se desee modificar siempre y cuando se acepte la confirmacion
 
     :param parametro1: conexion a bbdd
@@ -251,8 +243,6 @@ def modificarProfesor(conexionBBDD):
 def busquedaProfesor(conexionBBDD):
     
     """
-    Descripción corta de la función.
-
     Busca un profesor mediante cualquier atributo del mismo, si es localizado se devuelve el id 
     pera poder gestionarlo en otros metodos
 
@@ -368,8 +358,6 @@ def busquedaProfesor(conexionBBDD):
 def mostrarTodosProfesores(conexionBBDD):
     
     """
-    Descripción corta de la función.
-
     Muestra todos los profesores que haya en la tabla Profesores
 
     :param parametro1: conexion a bbdd
@@ -402,10 +390,7 @@ def mostrarTodosProfesores(conexionBBDD):
 def menuAtributos(): 
     
     """
-    Descripción corta de la función.
-
-    Menu de profesores donde se pueden elegir las diferentes operaciones de gestion relacionados con el mismo
-    Se pedir una opcion para entrar en alguno de los submenus, si insertas 0, sale al menuPrincipal
+    Menu de atributos del profesor entre los que se pueden elegir
 
     :param parametro1: conexion a bbdd
     """
@@ -421,6 +406,13 @@ def menuAtributos():
     return opcion
     
 def menuProfesores(conexionBBDD):
+    
+    """
+    Menu de profesores donde se pueden elegir las diferentes operaciones de gestion relacionados con el mismo
+    Se pedira una opcion para entrar en alguno de los submenus, si insertas 0, sale al menuPrincipal
+
+    :param parametro1: conexion a bbdd
+    """
     
     finMenuProfesor = False
     
@@ -447,6 +439,6 @@ def menuProfesores(conexionBBDD):
             mostrarTodosProfesores(conexionBBDD)
         elif(opcion=="0"):
             finMenuProfesor = True
-            print("Regresando a Menu Principal. Fin Menu Profesores")
+            print("Regresando a Menu Principal")
         else:
             print("Opcion no valida")       

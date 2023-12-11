@@ -8,8 +8,6 @@ from pymysql import IntegrityError
 def impartirCurso(conexionBBDD):
     
     """
-    Descripción corta de la función.
-
     Se realizan las busquedas de los id de curso y profesor para realizar la inserccion
     Luego se hace una consulta para ver si el curso ya existe en la tabla, es decir, si esta siendo impartido,
     y si no esta siendo impartido, se insertan ambos id de curso y profesor en la tabla intermedia
@@ -50,8 +48,6 @@ def impartirCurso(conexionBBDD):
 def dejarImpartirCurso(conexionBBDD):
     
     """
-    Descripción corta de la función.
-
     Se realizan las busquedas de los id de curso y profesor para realizar el borrado
     Luego se hace una consulta para ver si la vinculacion ya existe, y si es asi, se procede a la eliminacion
 
@@ -89,8 +85,6 @@ def dejarImpartirCurso(conexionBBDD):
 def matricularAlumno(conexionBBDD):
     
     """
-    Descripción corta de la función.
-
     Se realizan las busquedas de los id de curso y alumno para realizar la inserccion
     Luego se hace una consulta para ver si el curso ya esta matriculado con ese alumno
     y si no es asi, se procede a su matriculacion
@@ -131,8 +125,6 @@ def matricularAlumno(conexionBBDD):
 def desmatricularAlumno(conexionBBDD):
     
     """
-    Descripción corta de la función.
-
     Se realizan las busquedas de los id de curso y alumno para realizar el borrado
     Luego se hace una consulta para ver si el curso esta vinculado al alumno,
     y si es asi, se procede a la eliminacion
@@ -172,8 +164,6 @@ def mostrarRelacionesAlumnos(conexionBBDD):
     print("--- Mostrar Matriculaciones Alumnos ---")
     
     """
-    Descripción corta de la función.
-
     Se realiza una consulta multitabla entre alumnos y cursos y mostrar los datos de la uniones
 
     :param parametro1: conexion a bbdd
@@ -210,8 +200,6 @@ def mostrarRelacionesProfesores(conexionBBDD):
     print("--- Mostrar Asignaciones Profesor ---")
 
     """
-    Descripción corta de la función.
-
     Se realiza una consulta multitabla entre profesores y cursos y mostrar los datos de la uniones
 
     :param parametro1: conexion a bbdd
@@ -245,8 +233,6 @@ def menuVinculaciones(conexionBBDD):
     
 
     """
-    Descripción corta de la función.
-
     Menu vinculaciones para elegir una de las gestion mediante la insercion de un numero
 
     :param parametro1: conexion a bbdd
