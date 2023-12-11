@@ -192,15 +192,14 @@ def mostrarRelacionesAlumnos(conexionBBDD):
         
         if(filas):
             for f in filas:
-                if(f[0]):
-                    print("Alumno:", f[0])
-                    print("Nombre:", f[1])
-                    print("Apellidos:", f[2])
-                    print("Teléfono:", f[3])
-                    print("Dirección:", f[4])
-                    print("Fecha de Nacimiento:", f[5])
-                    print("Cursos:", f[6])
-                    print("\n")
+                print("Alumno:", f[0])
+                print("Nombre:", f[1])
+                print("Apellidos:", f[2])
+                print("Teléfono:", f[3])
+                print("Dirección:", f[4])
+                print("Fecha de Nacimiento:", f[5])
+                print("Cursos:", f[6])
+                print("\n")
         else:
             print("No hay alumnos matriculados en cursos")
                 
