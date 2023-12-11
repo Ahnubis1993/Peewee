@@ -144,7 +144,7 @@ def crearTablaCursos(conexion):
         cursor = conexion.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS Cursos("
             "Codigo INT AUTO_INCREMENT PRIMARY KEY," 
-            "Nombre VARCHAR(25) NOT NULL,"
+            "Nombre VARCHAR(25) NOT NULL UNIQUE,"
             "Descripcion VARCHAR(25) NOT NULL)")
         conexion.commit()
         cursor.close() 

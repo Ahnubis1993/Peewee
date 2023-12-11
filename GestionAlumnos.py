@@ -102,7 +102,7 @@ def insertarAlumno(conexionBBDD):
                 else:
                     print("Error al introducir el alumno en la base de datos")
                     
-            except Exception:
+            except:
                 print("Alumno no dado de alta, fallo al introducir el alumno en la base de datos")
                 
             finally:

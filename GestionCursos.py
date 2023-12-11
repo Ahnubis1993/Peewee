@@ -1,3 +1,4 @@
+from pymysql import IntegrityError
 from Utilidades import confirmacion
 
 def insertarCurso(conexionBBDD):
@@ -48,15 +49,21 @@ def insertarCurso(conexionBBDD):
                 conexionBBDD.commit()
                 print("Alta realizada correctamente")
                 
+            except IntegrityError as e:
+                #Captura error de integridad de la base de datos
+                if ("Duplicate entry" in str(e)):
+                    print("Ya existe un curso con ese nombre")
+                else:
+                    print("Error al introducir el curso en la base de datos")
             except:
-                print("Error al introducir el curso en la base de datos")
+                print("Curso no dado de alta, fallo al introducir el curso en la base de datos")
             finally:
                 if (cursor is not None):
                     cursor.close()
         else:
             print("Has introducido el dato mal 5 veces. Alta cancelada.")
             
-        if(not confirmacion("No se ha realizado el alta correctamente. Deseas introducir un curso? (S/N): ")):
+        if(not confirmacion("Deseas introducir un curso? (S/N): ")):
             fin = True
             print("Fin alta Curso")
     

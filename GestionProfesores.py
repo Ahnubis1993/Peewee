@@ -22,10 +22,10 @@ def insertarProfesor(conexionBBDD):
         correcto = False
     
         while(not correcto and intentos>0):
-            dniProfesor = input("Introduce el dni del profesor: ").strip()
+            dniProfesor = input("Introduce el DNI del profesor: ").strip()
             if(len(dniProfesor)==9 and dniProfesor[8:].isdigit and dniProfesor[8:].isalpha): 
                 correcto = True   
-                print("el dni introducido es valido")
+                print("El DNI introducido es valido")
             else:
                 print("El dni debe esta formado por 8 digitos y 1 letra")
             intentos -= 1 
@@ -83,7 +83,7 @@ def insertarProfesor(conexionBBDD):
                     print("Ya existe un profesor con el mismo DNI.")
                 else:
                     print("Error al introducir el profesor en la base de datos")
-            except Exception:
+            except:
                 print("Profesor no dado de alta, fallo al introducir el profesor en la base de datos")
             finally: 
                 if (cursor is not None):
