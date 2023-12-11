@@ -1,6 +1,16 @@
 import pymysql
 
 def leerConfiguracion():
+    
+    """
+    Descripción corta de la función.
+
+    Lee un fichero por lineas para buscar mlos datos que se insertan 
+    en la configuracion del acceso a la bbddd
+
+    :param parametro1: conexion a bbdd
+    """
+    
     # Leemos fichero configuracion    
     file = open("ConfiguracionBBDD.txt","r")
     # Leo y cargo las lineas en la variable archivoConfiguracion
@@ -41,6 +51,13 @@ def leerConfiguracion():
           
 def conectar():
     
+    """
+    Se conecta a la bbdd mediante la configuracion obtenida en el fichero,
+    establece conexion y crea la la bbdd correspodiente
+
+    :param parametro1: conexion a bbdd
+    """
+    
     # Leemos la configuracion estructurada
     config = leerConfiguracion()
     
@@ -64,6 +81,15 @@ def conectar():
         return None
     
 def crearTablaProfesores(conexion):
+    
+    """
+    Crea la tabla profesores con una clave primaria autoincrementada
+    Se establecen los atributos a not null para que se obligue a su insercion
+    y se crea un indice unico para los dni
+
+    :param parametro1: conexion a bbdd
+    """
+    
     try:
         cursor = conexion.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS Profesores("
@@ -79,6 +105,15 @@ def crearTablaProfesores(conexion):
         print("Tabla Profesores no creada correctamente: "+str(e))
     
 def crearTablaAlumnos(conexion):
+    
+    """
+    Crea la tabla alumnos con una clave primaria
+    Se establecen los atributos a not null para que se obligue a su insercion
+    y se crea un indice unico para el numero expediente
+
+    :param parametro1: conexion a bbdd
+    """
+    
     try:
         cursor = conexion.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS Alumnos("
@@ -97,6 +132,14 @@ def crearTablaAlumnos(conexion):
         print("Tabla Alumnos no creada correctamente: "+str(e))
     
 def crearTablaCursos(conexion):
+    
+    """
+    Crea la tabla cursos con una clave primaria autoincrementada
+    Se establecen los atributos a not null para que se obligue a su insercion
+
+    :param parametro1: conexion a bbdd
+    """
+    
     try:
         cursor = conexion.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS Cursos("
@@ -109,6 +152,15 @@ def crearTablaCursos(conexion):
         print("Tabla Cursos no creada correctamente: "+str(e))
         
 def crearTablaAlumnosCursos(conexion):
+    
+    """
+    Crea la tabla alumnos_cursos con 2 columnas de los id de las tablas principales,
+    ambas columnas son clave primaria y foranea a la vez, ademas se crea un borrado y modificacion en cascada
+    para que cuando se borre un dato de la tabla principal, elimine la relacion
+
+    :param parametro1: conexion a bbdd
+    """
+    
     try:
         cursor = conexion.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS Alumnos_Cursos("
@@ -123,6 +175,15 @@ def crearTablaAlumnosCursos(conexion):
         print("Tabla Alumnos_Cursos no creada correctamente: " + str(e))
         
 def crearTablaProfesoresCursos(conexion):
+    
+    """
+    Crea la tabla profesores_cursos con 2 columnas de los id de las tablas principales,
+    ambas columnas son clave primaria y foranea a la vez, ademas se crea un borrado y modificacion en cascada
+    para que cuando se borre un dato de la tabla principal, elimine la relacion
+
+    :param parametro1: conexion a bbdd
+    """
+    
     try:
         cursor = conexion.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS Profesores_Cursos("
@@ -139,33 +200,16 @@ def crearTablaProfesoresCursos(conexion):
 
 
 def crearTablas(conexion):
+
+    """
+    Se unen los metodos de creaciones de tablas para realizarlo desde 1 solo metodo
+
+    :param parametro1: conexion a bbdd
+    """
+    
     crearTablaAlumnos(conexion)
     crearTablaProfesores(conexion)
     crearTablaCursos(conexion)
     crearTablaAlumnosCursos(conexion)
     crearTablaProfesoresCursos(conexion)
     
-def borradoTablas(conexion):
-    try:
-        cursor = conexion.cursor()
-        
-        # Eliminar claves foráneas de la tabla Alumnos_Cursos
-        cursor.execute("ALTER TABLE Alumnos_Cursos DROP FOREIGN KEY Num_Expediente;")
-        cursor.execute("ALTER TABLE Alumnos_Cursos DROP FOREIGN KEY Id_Curso;")
-
-        
-        # Eliminar claves foráneas de la tabla Profesores_Cursos
-        cursor.execute("ALTER TABLE Profesores_Cursos DROP FOREIGN KEY Id_Profesor;")
-        cursor.execute("ALTER TABLE Profesores_Cursos DROP FOREIGN KEY Id_Curso;")
-
-        cursor.execute("DROP TABLE IF EXISTS Profesores;")
-        cursor.execute("DROP TABLE IF EXISTS Alumnos;")
-        cursor.execute("DROP TABLE IF EXISTS Cursos;")
-        cursor.execute("DROP TABLE IF EXISTS Alumnos_Cursos;")
-        cursor.execute("DROP TABLE IF EXISTS Profesores_Cursos;")
-        
-        conexion.commit()
-        cursor.close()
-        print("Tablas borradas correctamente")
-    except Exception as e:
-        print("Fallo al borrar las tablas: " + str(e))

@@ -3,86 +3,113 @@ from pymysql import IntegrityError
 
 
 def insertarProfesor(conexionBBDD):
+    
+    """
+    Descripción corta de la función.
+
+    Da de alta un profesor, si alguno de los atributos a asignar falla 5 veces, no se crea el profesor 
+    y se pide si quieres dar de alta otro
+
+    :param parametro1: conexion a bbdd
+    """
+    
     print("--- Alta Profesor ---")
     
     intentos = 5
     correcto = False
     
-    while(not correcto and intentos>0):
-        dniProfesor = input("Introduce el dni del profesor: ").strip()
-        if(len(dniProfesor)==9 and dniProfesor[8:].isdigit and dniProfesor[8:].isalpha): 
-            correcto = True   
-            print("el dni introducido es valido")
-        else:
-            print("El dni debe esta formado por 8 digitos y 1 letra")
-        intentos -= 1 
+    while(not correcto):
     
-    if(correcto):
-        correcto = False
-        intentos = 5
-        
         while(not correcto and intentos>0):
-            nombreProfesor = input("Introduce el nombre del profesor: ").strip()
-            if(nombreProfesor != ""): 
+            dniProfesor = input("Introduce el dni del profesor: ").strip()
+            if(len(dniProfesor)==9 and dniProfesor[8:].isdigit and dniProfesor[8:].isalpha): 
                 correcto = True   
-                print("El nombre introducido es valido")
+                print("el dni introducido es valido")
             else:
-                print("El nombre no puede estar vacio")
+                print("El dni debe esta formado por 8 digitos y 1 letra")
             intentos -= 1 
-
-    if(correcto):
-        correcto = False
-        intentos = 5
         
-        while(not correcto and intentos>0):
-            direccionProfesor = input("Introduce la direccion del profesor: ").strip()
-            if(direccionProfesor != ""): 
-                correcto = True   
-                print("La direccion introducida es valida")
-            else:
-                print("La direccion no puede estar vacia")
-            intentos -= 1    
+        if(correcto):
+            correcto = False
+            intentos = 5
+            
+            while(not correcto and intentos>0):
+                nombreProfesor = input("Introduce el nombre del profesor: ").strip()
+                if(nombreProfesor != ""): 
+                    correcto = True   
+                    print("El nombre introducido es valido")
+                else:
+                    print("El nombre no puede estar vacio")
+                intentos -= 1 
 
-    if(correcto):
-        correcto = False
-        intentos = 5
-        
-        while(not correcto and intentos>0):
-            telefonoProfesor = input("Introduce el telefono del profesor: ").strip()
-            if(telefonoProfesor.isdigit() and len(telefonoProfesor)==9): 
-                correcto = True   
-                print("El telefono introducido es valido")
-            else:
-                print("El telefono debe tener una longitud de 9 digitos")
-            intentos -= 1 
-                      
-    if(correcto):
-        try:
-            cursor = conexionBBDD.cursor()
-            cursor.execute("INSERT INTO Profesores (dni, nombre, direccion, telefono) VALUES (%s, %s, %s, %s)",
-                           (dniProfesor.upper(), nombreProfesor, direccionProfesor, telefonoProfesor))
-            conexionBBDD.commit()
-            if(not confirmacion("El alta del profesor se ha realizado correctamente. Deseas introducir otro profesor? (S/N): ")):
+        if(correcto):
+            correcto = False
+            intentos = 5
+            
+            while(not correcto and intentos>0):
+                direccionProfesor = input("Introduce la direccion del profesor: ").strip()
+                if(direccionProfesor != ""): 
+                    correcto = True   
+                    print("La direccion introducida es valida")
+                else:
+                    print("La direccion no puede estar vacia")
+                intentos -= 1    
+
+        if(correcto):
+            correcto = False
+            intentos = 5
+            
+            while(not correcto and intentos>0):
+                telefonoProfesor = input("Introduce el telefono del profesor: ").strip()
+                if(telefonoProfesor.isdigit() and len(telefonoProfesor)==9): 
+                    correcto = True   
+                    print("El telefono introducido es valido")
+                else:
+                    print("El telefono debe tener una longitud de 9 digitos")
+                intentos -= 1 
+            
+            
+        if(correcto):
+            # se pone a false porque viene true, para poder ingresar otro profesor
+            correcto = False   
+            try:
+                cursor = conexionBBDD.cursor()
+                cursor.execute("INSERT INTO Profesores (dni, nombre, direccion, telefono) VALUES (%s, %s, %s, %s)",
+                            (dniProfesor.upper(), nombreProfesor, direccionProfesor, telefonoProfesor))
+                conexionBBDD.commit()
+                
+                if(not confirmacion("El alta del profesor se ha realizado correctamente. Deseas introducir otro profesor? (S/N): ")):
+                    correcto = True
+                    print("Fin alta Profesor")
+                    
+            except IntegrityError as e:
+                if "Dni_UNIQUE" in str(e):
+                    print("Ya existe un profesor con mismo DNI.")
+                else:
+                    print("Error al introducir el curso en la base de datos")
+            except Exception:
+                print("Profesor no dado de alta, fallo al introducir el profesor en la base de datos")
+            finally: 
+                if (cursor is not None):
+                    cursor.close()
+
+        else:
+            correcto = False
+            if(not confirmacion("El alta del profesor no se ha realizado correctamente. Deseas introducir un profesor? (S/N): ")):
                 correcto = True
                 print("Fin alta Profesor")
-                
-        except IntegrityError as e:
-            if "Dni_UNIQUE" in str(e):
-                print("Ya existe un profesor con mismo DNI.")
-            else:
-                print("Error al introducir el curso en la base de datos")
-        except Exception:
-            print("Profesor no dado de alta, fallo al introducir el profesor en la base de datos")
-        finally:
-            if (cursor is not None):
-                cursor.close()
-
-    else:
-        if(not confirmacion("El alta del profesor no se ha realizado correctamente. Deseas introducir un profesor? (S/N): ")):
-            correcto = True
-            print("Fin alta Profesor")
             
 def eliminarProfesor(conexionBBDD):
+    
+    """
+    Descripción corta de la función.
+
+    Elimina un profesor mediante el id que es buscado por el metodo busquedaProfesor
+    Se obtiene el id del mismo y se elemina de las correspondientes tablas en la que se encuentre
+
+    :param parametro1: conexion a bbdd
+    """
+    
     print("--- Baja Profesor ---")
     idProfesor = busquedaProfesor(conexionBBDD)
     if(idProfesor != -1):
@@ -106,6 +133,16 @@ def eliminarProfesor(conexionBBDD):
         print("No hay resultados de busqueda. Fin baja profesor")
     
 def modificarProfesor(conexionBBDD):
+    
+    """
+    Descripción corta de la función.
+
+    Modifica un profesor mediante que es buscado por id en metodo busqueda, mediante el id
+    del profesor, seleccionamos el atributo que se desee modificar siempre y cuando se acepte la confirmacion
+
+    :param parametro1: conexion a bbdd
+    """
+    
     print("--- Modificacion Profesor ---")
     
     idProfesor = busquedaProfesor(conexionBBDD) 
@@ -216,6 +253,16 @@ def modificarProfesor(conexionBBDD):
         print("No hay resultados de busqueda. Fin modificar profesor")
         
 def busquedaProfesor(conexionBBDD):
+    
+    """
+    Descripción corta de la función.
+
+    Busca un profesor mediante cualquier atributo del mismo, si es localizado se devuelve el id 
+    pera poder gestionarlo en otros metodos
+
+    :param parametro1: conexion a bbdd
+    """
+    
     print("--- Busqueda Profesor ---")
     
     idProfesor = -1
@@ -303,7 +350,8 @@ def busquedaProfesor(conexionBBDD):
                       "Dni:"+f[1]+"\n"
                       "Nombre:"+f[2]+"\n"
                       "Direccion:"+f[3]+"\n"
-                      "Telefono:"+str(f[4])+"\n")
+                      "Telefono:"+str(f[4])+"\n"
+                      "--------------------------------\n")
             
             if(len(filasTablaProfesor)>1):
                 finIdProfesor = False
@@ -326,6 +374,15 @@ def busquedaProfesor(conexionBBDD):
     
 
 def mostrarTodosProfesores(conexionBBDD):
+    
+    """
+    Descripción corta de la función.
+
+    Muestra todos los profesores que haya en la tabla Profesores
+
+    :param parametro1: conexion a bbdd
+    """
+    
     print("--- Mostrar Todos los Profesores ---")
     
     try:
@@ -341,12 +398,23 @@ def mostrarTodosProfesores(conexionBBDD):
                     "Dni:"+f[1]+"\n"
                     "Nombre:"+f[2]+"\n"
                     "Direccion:"+f[3]+"\n"
-                    "Telefono:"+str(f[4])+"\n")
+                    "Telefono:"+str(f[4])+"\n"
+                    "--------------------------------\n")
             
     except:
         print("No se han podido mostrar todos los profesores")
     
 def menuAtributos(): 
+    
+    """
+    Descripción corta de la función.
+
+    Menu de profesores donde se pueden elegir las diferentes operaciones de gestion relacionados con el mismo
+    Se pedir una opcion para entrar en alguno de los submenus, si insertas 0, sale al menuPrincipal
+
+    :param parametro1: conexion a bbdd
+    """
+    
     print("Elige un atributo de los siguientes: ")
     print("--- Atributos ---")
     print("1 - Dni")

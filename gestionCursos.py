@@ -1,56 +1,80 @@
 from Utilidades import confirmacion
 
 def insertarCurso(conexionBBDD):
+    
+    """
+    Descripción corta de la función.
+
+    Da de alta un curso, si alguno de los atributos a asignar falla 5 veces, no se crea el curso 
+    y se pide si quieres dar de alta otro
+
+    :param parametro1: conexion a bbdd
+    """
+    
     print("--- Alta Curso ---")
     
     correcto = False
     intentos = 5
     
-    while(not correcto and intentos>0):
-        nombreCurso = input("Introduce nombre del curso: ").strip()
-        if(nombreCurso != ""):
-            correcto = True
-            print("Nombre del curso valido")
-        else:
-            print("El nombre no puede estar vacio")
-        intentos -= 1
+    while(not correcto):
     
-    if(correcto):
-        
-        correcto = False
-        intentos = 5
-        
         while(not correcto and intentos>0):
-            descripcionCurso = input("Introduce la descripcion del curso: ").strip()
-            if(descripcionCurso != ""):
+            nombreCurso = input("Introduce nombre del curso: ").strip()
+            if(nombreCurso != ""):
                 correcto = True
-                print("Descripcion del curso valida")
+                print("Nombre del curso valido")
             else:
-                print("La descripcion del curso no puede estar vacia")
+                print("El nombre no puede estar vacio")
             intentos -= 1
-    
-    if(correcto):
-        try:
-            cursor = conexionBBDD.cursor()
-            cursor.execute("INSERT INTO Cursos (nombre, descripcion) VALUES (%s, %s)",
-                           (nombreCurso, descripcionCurso))
-            conexionBBDD.commit()
-            if(not confirmacion("El alta del curso se ha realizado correctamente. Deseas introducir otro curso? (S/N): ")):
+        
+        if(correcto):
+            
+            correcto = False
+            intentos = 5
+            
+            while(not correcto and intentos>0):
+                descripcionCurso = input("Introduce la descripcion del curso: ").strip()
+                if(descripcionCurso != ""):
+                    correcto = True
+                    print("Descripcion del curso valida")
+                else:
+                    print("La descripcion del curso no puede estar vacia")
+                intentos -= 1
+        
+        if(correcto):
+            correcto = False
+            try:
+                cursor = conexionBBDD.cursor()
+                cursor.execute("INSERT INTO Cursos (nombre, descripcion) VALUES (%s, %s)",
+                            (nombreCurso, descripcionCurso))
+                conexionBBDD.commit()
+                if(not confirmacion("El alta del curso se ha realizado correctamente. Deseas introducir otro curso? (S/N): ")):
+                    correcto = True
+                    print("Fin alta Curso")
+                
+            except:
+                #TODO
+                print("Curso no se ha dado de alta")
+            finally:
+                cursor.close()
+        else:
+            correcto = False
+            if(not confirmacion("No se ha realizado el alta correctamente. Deseas introducir un curso? (S/N): ")):
                 correcto = True
                 print("Fin alta Curso")
-            
-        except:
-            #TODO
-            print("Curso no se ha dado de alta")
-        finally:
-            cursor.close()
-    else:
-        if(not confirmacion("No se ha realizado el alta correctamente. Deseas introducir un curso? (S/N): ")):
-            correcto = True
-            print("Fin alta Curso")
     
 
 def eliminarCursor(conexionBBDD):
+    
+    """
+    Descripción corta de la función.
+
+    Elimina un curso mediante el id que es buscado por el metodo busquedaCurso
+    Se obtiene el id del mismo y se elemina de las correspondientes tablas en la que se encuentre
+
+    :param parametro1: conexion a bbdd
+    """
+    
     print("--- Baja Curso ---")
     codigoCurso = busquedaCurso(conexionBBDD)
     if(codigoCurso != -1):
@@ -59,7 +83,7 @@ def eliminarCursor(conexionBBDD):
             if(confirmacion("Estas seguro de que deseas eliminar el curso? (S/N): ")):
                 cursor.execute("DELETE FROM Cursos WHERE Codigo=%s",codigoCurso)
                 conexionBBDD.commit()
-                print("Curso borrado correctamente\n")
+                print("Curso borrado correctamente")
             else:
                 print("La baja del curso ha sido cancelada")
            
@@ -71,6 +95,16 @@ def eliminarCursor(conexionBBDD):
         print("No hay resultados de busqueda. Fin baja Curso")
     
 def modificarCurso(conexionBBDD):
+    
+    """
+    Descripción corta de la función.
+
+    Modifica un curso mediante que es buscado por id en metodo busqueda, mediante el id
+    del curso, seleccionamos el atributo que se desee modificar siempre y cuando se acepte la confirmacion
+
+    :param parametro1: conexion a bbdd
+    """
+    
     print("--- Modificacion Curso ---")
     
     codigoCurso = busquedaCurso(conexionBBDD)  
@@ -139,6 +173,15 @@ def modificarCurso(conexionBBDD):
         
 def busquedaCurso(conexionBBDD):
     
+    """
+    Descripción corta de la función.
+
+    Busca un curso mediante cualquier atributo del mismo, si es localizado se devuelve el id 
+    pera poder gestionarlo en otros metodos
+
+    :param parametro1: conexion a bbdd
+    """
+    
     codigoCurso = -1
     finBusquedaCurso = False
     filasTablaCurso = []
@@ -188,7 +231,8 @@ def busquedaCurso(conexionBBDD):
             for f in filasTablaCurso:
                 print("Codigo:"+str(f[0])+"\n"
                     "Nombre:"+f[1]+"\n"
-                    "Descripcion:"+f[2]+"\n")
+                    "Descripcion:"+f[2]+"\n"
+                "--------------------------------\n")
             
             if(len(filasTablaCurso)>1):
                 finBusquedaIdCurso = False
@@ -211,6 +255,15 @@ def busquedaCurso(conexionBBDD):
     return codigoCurso
 
 def mostrarTodosCursos(conexionBBDD):
+    
+    """
+    Descripción corta de la función.
+
+    Muestra todos los cursos que haya en la tabla Cursos
+
+    :param parametro1: conexion a bbdd
+    """
+    
     print("--- Mostrar Todos los Cursos ---")
     
     try:
@@ -224,12 +277,22 @@ def mostrarTodosCursos(conexionBBDD):
         for f in filas:
             print("Codigo:"+str(f[0])+"\n"
                     "Nombre:"+f[1]+"\n"
-                    "Descripcion:"+f[2]+"\n")
+                    "Descripcion:"+f[2]+"\n"
+            "--------------------------------\n")
             
     except:
         print("No se han podido mostrar todos los cursos")
     
 def menuCursos(conexionBBDD):
+    
+    """
+    Descripción corta de la función.
+
+    Menu de cursos donde se pueden elegir las diferentes operaciones de gestion relacionados con el mismo
+    Se pedir una opcion para entrar en alguno de los submenus, si insertas 0, sale al menuPrincipal
+
+    :param parametro1: conexion a bbdd
+    """
     
     finMenuCurso = False
     

@@ -83,7 +83,7 @@ def insertarAlumno(conexionBBDD):
                     print("Fecha valida")
                 else:
                     print("El formato de la fecha no es correcto. Debe ser yyyy-mm-dd")
-                intentos -= 1    
+                intentos -= 1   
         
                         
         if (correcto):
@@ -122,7 +122,7 @@ def eliminarAlumno(conexionBBDD):
     print("--- Baja Alumno ---")
     expediente = busquedaAlumno(conexionBBDD)
     if(expediente != -1):
-        if (confirmacion("Estas seguro de que deseas eliminar el alumno con numero de expediente '"+expediente+"'? (S/N)")):
+        if (confirmacion("Estas seguro de que deseas eliminar el alumno con numero de expediente '"+str(expediente)+"'? (S/N)")):
             try:
                 cursor = conexionBBDD.cursor()
                 cursor.execute("DELETE FROM Alumnos WHERE Num_Expediente=%s",(expediente))
