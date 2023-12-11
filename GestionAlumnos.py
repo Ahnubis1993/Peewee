@@ -84,7 +84,6 @@ def insertarAlumno(conexionBBDD):
                 else:
                     print("El formato de la fecha no es correcto. Debe ser yyyy-mm-dd")
                 intentos -= 1   
-        
                         
         if (correcto):
             try:
@@ -95,8 +94,7 @@ def insertarAlumno(conexionBBDD):
                 print("Alta realizada correctamente.")
                 
             except IntegrityError as e:
-                # Capturar error de integridad de la base de datos
-                correcto = False
+                # Captura error de integridad de la base de datos
                 if "Duplicate entry" in str(e):
                     print("Ya existe un alumno con el mismo nombre y apellidos.")
                 elif "Incorrect date value" in str(e):
@@ -104,15 +102,14 @@ def insertarAlumno(conexionBBDD):
                 else:
                     print("Error al introducir el alumno en la base de datos")
                     
-            except Exception as e:
-                correcto = False
-                print(f"Alumno no dado de alta, fallo al introducir el alumno en la base de datos\n {e}")
+            except Exception:
+                print("Alumno no dado de alta, fallo al introducir el alumno en la base de datos")
                 
             finally:
                 if (cursor is not None):
                     cursor.close()
         else:
-            print("Has intriducido el dato mal 5 veces. Alta cancelada.")
+            print("Has introducido el dato mal 5 veces. Alta cancelada.")
             
         if(not confirmacion("Deseas introducir otro alumno? (S/N): ")):
             fin = True
