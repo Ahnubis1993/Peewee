@@ -64,7 +64,6 @@ def eliminarCursor(conexionBBDD):
                 print("La baja del curso ha sido cancelada")
            
         except:
-            #TODO
             print("Consulta de borrado Curso no valida")
         finally:
             cursor.close()
@@ -131,7 +130,10 @@ def modificarCurso(conexionBBDD):
             if(modificado):
                 if(not confirmacion("Deseas modificar algo mas de este curso? (S/N): ")):
                     finModificacionCurso = True
-            
+            else:
+                if(not confirmacion("No has modificado ningun atributo de curso. Deseas modificar alguno? (S/N): ")):
+                    finModificacionCurso = True
+                    
     else:
         print("No hay resultados de busqueda. Fin modificacion Curso")   
         
@@ -195,13 +197,13 @@ def busquedaCurso(conexionBBDD):
                     if(codigoCurso.isdigit()):
                         codigoCursoEncontrado = [fila for fila in filasTablaCurso if(f[0]==int(codigoCurso))]
                         if(codigoCursoEncontrado):
-                            finBusquedaIdCurso = True
                             codigoCurso = codigoCursoEncontrado[0]
+                            finBusquedaIdCurso = True
                     else:
                         print("Tienes que insertar un numero")
             elif(len(filasTablaCurso)==1):
-                finBusquedaCurso = True
                 codigoCurso = filasTablaCurso[0][0]
+                finBusquedaCurso = True
         else:
             if(not confirmacion("No se han encontrado resultados. Deseas buscar de nuevo? (S/N): ")):
                 finBusquedaCurso = True 

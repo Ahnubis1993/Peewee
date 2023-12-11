@@ -50,6 +50,7 @@ def conectar():
         conexion = pymysql.connect(**config)
         cursor = conexion.cursor()
         # Si la base de datos no existe, crearla
+        # cursor.execute("DROP DATABASE IF EXISTS jorgeGomez_gustavoPlaza;")
         cursor.execute("CREATE DATABASE IF NOT EXISTS jorgeGomez_gustavoPlaza")
         
         # Seleccionar la base de datos
@@ -143,3 +144,28 @@ def crearTablas(conexion):
     crearTablaCursos(conexion)
     crearTablaAlumnosCursos(conexion)
     crearTablaProfesoresCursos(conexion)
+    
+def borradoTablas(conexion):
+    try:
+        cursor = conexion.cursor()
+        
+        # Eliminar claves foráneas de la tabla Alumnos_Cursos
+        cursor.execute("ALTER TABLE Alumnos_Cursos DROP FOREIGN KEY Num_Expediente;")
+        cursor.execute("ALTER TABLE Alumnos_Cursos DROP FOREIGN KEY Id_Curso;")
+
+        
+        # Eliminar claves foráneas de la tabla Profesores_Cursos
+        cursor.execute("ALTER TABLE Profesores_Cursos DROP FOREIGN KEY Id_Profesor;")
+        cursor.execute("ALTER TABLE Profesores_Cursos DROP FOREIGN KEY Id_Curso;")
+
+        cursor.execute("DROP TABLE IF EXISTS Profesores;")
+        cursor.execute("DROP TABLE IF EXISTS Alumnos;")
+        cursor.execute("DROP TABLE IF EXISTS Cursos;")
+        cursor.execute("DROP TABLE IF EXISTS Alumnos_Cursos;")
+        cursor.execute("DROP TABLE IF EXISTS Profesores_Cursos;")
+        
+        conexion.commit()
+        cursor.close()
+        print("Tablas borradas correctamente")
+    except Exception as e:
+        print("Fallo al borrar las tablas: " + str(e))

@@ -208,6 +208,9 @@ def modificarProfesor(conexionBBDD):
             if(modificado):
                 if(not confirmacion("Deseas modificar algo mas de este profesor? (S/N): ")):
                     finModificacionProfesor = True
+            else:
+                if(not confirmacion("No has modificado ningun atributo de profesor. Deseas modificar alguno? (S/N): ")):
+                    finModificacionProfesor = True
                 
     else:
         print("No hay resultados de busqueda. Fin modificar profesor")
@@ -304,19 +307,18 @@ def busquedaProfesor(conexionBBDD):
             
             if(len(filasTablaProfesor)>1):
                 finIdProfesor = False
-                while(finIdProfesor is False):
+                while(not finIdProfesor):
                     idProfesorBuscar = input("Introduce el id del profesor a elegir")
                     if(idProfesorBuscar.isdigit()):
                         idProfesorEncontrado = [fila for fila in filasTablaProfesor if(fila[0]==int(idProfesorBuscar))]
                         if(idProfesorEncontrado):
-                            finBusquedaProfesor = True
                             idProfesor = idProfesorEncontrado[0]
+                            finBusquedaProfesor = True
                     else:
                         print("Tienes que insertar un numero")
             elif(len(filasTablaProfesor)==1):
-                finBusquedaProfesor = True
                 idProfesor = filasTablaProfesor[0][0]
-                
+                finBusquedaProfesor = True
         else:
             if(not confirmacion("No se han encontrado resultados. Deseas buscar de nuevo? (S/N): ")):
                 finBusquedaProfesor = True
