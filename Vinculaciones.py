@@ -45,7 +45,7 @@ def impartirCurso(conexionBBDD):
             if(cursor is not None):
                 cursor.close()
     else:
-        print("Los resultados de busqueda no encuentran en la base de datos")
+        print("Los resultados de busqueda no encuentran en la base de datos\n")
     
 def dejarImpartirCurso(conexionBBDD):
     
@@ -84,7 +84,7 @@ def dejarImpartirCurso(conexionBBDD):
             if(cursor is not None):
                 cursor.close()
     else:
-        print("Los resultados de busqueda no encuentran en la base de datos")
+        print("Los resultados de busqueda no encuentran en la base de datos\n")
     
 def matricularAlumno(conexionBBDD):
     
@@ -126,7 +126,7 @@ def matricularAlumno(conexionBBDD):
             if(cursor is not None):
                 cursor.close()
     else:
-        print("Los resultados de busqueda no encuentran en la base de datos")
+        print("Los resultados de busqueda no encuentran en la base de datos\n")
     
 def desmatricularAlumno(conexionBBDD):
     
@@ -166,7 +166,7 @@ def desmatricularAlumno(conexionBBDD):
             if(cursor is not None):
                 cursor.close()
     else:
-        print("Los resultados de busqueda no encuentran en la base de datos")
+        print("Los resultados de busqueda no encuentran en la base de datos\n")
         
 def mostrarRelacionesAlumnos(conexionBBDD):
     print("--- Mostrar Matriculaciones Alumnos ---")
@@ -198,8 +198,7 @@ def mostrarRelacionesAlumnos(conexionBBDD):
                 print("Teléfono:", f[3])
                 print("Dirección:", f[4])
                 print("Fecha de Nacimiento:", f[5])
-                print("Cursos:", f[6])
-                print("\n")
+                print("Cursos:", f[6],"\n")
         else:
             print("No hay alumnos matriculados en cursos")
                 
@@ -234,8 +233,7 @@ def mostrarRelacionesProfesores(conexionBBDD):
                 print("Nombre:", f[2])
                 print("Direccion:", f[3])
                 print("Telefono:", f[4])
-                print("Curso:", f[5])
-                print("\n")
+                print("Curso:", f[5],"\n")
         else:
             print("No ha profesores asignados a cursos")        
         

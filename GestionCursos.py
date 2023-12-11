@@ -84,12 +84,12 @@ def eliminarCursor(conexionBBDD):
     if(codigoCurso != -1):
         try:
             cursor = conexionBBDD.cursor()
-            if(confirmacion("Estas seguro de que deseas eliminar el curso? (S/N): ")):
+            if(confirmacion("Estas seguro de que deseas eliminar el curso con codigo "+codigoCurso+"? (S/N): ")):
                 cursor.execute("DELETE FROM Cursos WHERE Codigo=%s",codigoCurso)
                 conexionBBDD.commit()
-                print("Curso borrado correctamente")
+                print("Curso con codigo "+codigoCurso+" ha sido dado de baja")
             else:
-                print("La baja del curso ha sido cancelada")
+                print("Curso con codigo "+codigoCurso+" no ha sido dado de baja")
            
         except:
             print("Consulta de borrado Curso no valida")

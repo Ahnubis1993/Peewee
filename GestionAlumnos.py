@@ -129,6 +129,8 @@ def eliminarAlumno(conexionBBDD):
                 print("Error al eliminar el alumno de la base de datos")
             finally:
                 cursor.close()
+        else:
+            print("Alumno con expediente "+str(expediente)+" no dado de baja")
     else:
         print("No hay resultados de busqueda. Fin de baja de alumno")
     
@@ -236,7 +238,6 @@ def modificarAlumno(conexionBBDD):
                 
             if(not finModificacion and not confirmacion("Deseas modificar otro atributo de este alumno? (S/N): ")):
                 finModificacion = True
-            #TODO hay que ver como se captura para pedir al USU si quieres volver a modificar
     else:
         print("No hay resultados de busqueda. Fin de modificacion de alumno")
     cursor.close()

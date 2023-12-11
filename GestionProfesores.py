@@ -112,15 +112,14 @@ def eliminarProfesor(conexionBBDD):
     if(idProfesor != -1):
         try:
             cursor = conexionBBDD.cursor()
-            if(confirmacion("Estas seguro de que deseas eliminar el profesor? (S/N): ")):
+            if(confirmacion("Estas seguro de que deseas eliminar el profesor con id"+str(idProfesor)+"? (S/N): ")):
                 cursor.execute("DELETE FROM Profesores WHERE Id=%s",(idProfesor))
                 conexionBBDD.commit()
-                print("Profesor dado de baja correctamente\n")
+                print("Profesor con id "+str(idProfesor)+" ha sido dado de baja")
             else:
-                print("Has cancelado la baja del profesor")
+                print("Profesor con id "+str(idProfesor)+" no ha sido dado de baja")
 
         except:
-            #TODO
             print("Consulta de borrado Profesor no valida")
         finally:
             if (cursor is not None):

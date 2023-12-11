@@ -67,7 +67,7 @@ def conectar():
         conexion = pymysql.connect(**config)
         cursor = conexion.cursor()
         # Si la base de datos no existe, crearla
-        # cursor.execute("DROP DATABASE IF EXISTS jorgeGomez_gustavoPlaza;")
+        
         cursor.execute("CREATE DATABASE IF NOT EXISTS jorgeGomez_gustavoPlaza")
         
         # Seleccionar la base de datos
