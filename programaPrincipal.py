@@ -41,7 +41,7 @@ while(not finMenuPrincipal):
         if(confirmacion("Estas seguro que deseas salir del programa? (S/N): ")):
             finMenuPrincipal=True
             conexionBBDD.close()
-            print("Finalizando Pograma")
+            print("Finalizando programa")
         else:
             print("Has cancelado la finalzacion del programa")      
     else:

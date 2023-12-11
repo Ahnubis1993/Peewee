@@ -280,7 +280,6 @@ def busquedaProfesor(conexionBBDD):
                     cursor.execute("SELECT * FROM Profesores WHERE Dni=%s", (dniProfesor))
                     filasTablaProfesor = cursor.fetchall()
                 except:
-                    #TODO
                     print("Consulta por Dni no valida")
                 finally:
                     if (cursor is not None):
@@ -295,7 +294,6 @@ def busquedaProfesor(conexionBBDD):
                     cursor.execute("SELECT * FROM Profesores WHERE Nombre=%s", (nombreProfesor))
                     filasTablaProfesor = cursor.fetchall()
                 except:
-                    #TODO
                     print("Consulta por Nombre no valida")
                 finally:
                     if (cursor is not None):
@@ -312,7 +310,6 @@ def busquedaProfesor(conexionBBDD):
                     filasTablaProfesor = cursor.fetchall()
                     cursor.close()
                 except:
-                    #TODO
                     print("Consulta por Direccion no valida")
                 finally:
                     if (cursor is not None):
@@ -328,7 +325,6 @@ def busquedaProfesor(conexionBBDD):
                     cursor.execute("SELECT * FROM Profesores WHERE Telefono=%s", (telefonoProfesor))
                     filasTablaProfesor = cursor.fetchall()
                 except:
-                    #TODO
                     print("Consulta por Telefono no valida")
                 finally:
                     if (cursor is not None):
@@ -403,6 +399,9 @@ def mostrarTodosProfesores(conexionBBDD):
             
     except:
         print("No se han podido mostrar todos los profesores")
+    finally: 
+        if (cursor is not None):
+            cursor.close()
     
 def menuAtributos(): 
     

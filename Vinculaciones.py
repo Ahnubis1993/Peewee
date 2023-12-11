@@ -186,13 +186,12 @@ def mostrarRelacionesAlumnos(conexionBBDD):
                        "Alumnos.Direccion, Alumnos.Fecha_Nacimiento, GROUP_CONCAT(Cursos.Nombre) AS Cursos "
                        "FROM Alumnos_Cursos, Cursos, Alumnos "
                        "WHERE Alumnos.Num_Expediente = Alumnos_Cursos.Num_Expediente "
-                       "AND Cursos.Codigo = Alumnos_Cursos.Id_Curso"
+                       "AND Cursos.Codigo = Alumnos_Cursos.Id_Curso "
                        "GROUP BY Alumnos.Num_Expediente")
         filas = cursor.fetchall()
         
         if(filas):
             for f in filas:
-                idAlu = f[0]
                 if(f[0]):
                     print("Alumno:", f[0])
                     print("Nombre:", f[1])
@@ -200,7 +199,7 @@ def mostrarRelacionesAlumnos(conexionBBDD):
                     print("Teléfono:", f[3])
                     print("Dirección:", f[4])
                     print("Fecha de Nacimiento:", f[5])
-                    print("Curso:", f[6])
+                    print("Cursos:", f[6])
                     print("\n")
         else:
             print("No hay alumnos matriculados en cursos")

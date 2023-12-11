@@ -53,10 +53,10 @@ def insertarCurso(conexionBBDD):
                     print("Fin alta Curso")
                 
             except:
-                #TODO
                 print("Curso no se ha dado de alta")
             finally:
                 cursor.close()
+                
         else:
             correcto = False
             if(not confirmacion("No se ha realizado el alta correctamente. Deseas introducir un curso? (S/N): ")):
@@ -89,8 +89,9 @@ def eliminarCursor(conexionBBDD):
            
         except:
             print("Consulta de borrado Curso no valida")
-        finally:
-            cursor.close()
+        finally: 
+            if (cursor is not None):
+                cursor.close()
     else:
         print("No hay resultados de busqueda. Fin baja Curso")
     
@@ -128,13 +129,15 @@ def modificarCurso(conexionBBDD):
                             cursor = conexionBBDD.cursor()
                             cursor.execute("UPDATE Cursos SET Nombre=%s WHERE Codigo=%s", (nuevoNombreCurso, codigoCurso))
                             conexionBBDD.commit()
-                            cursor.close()
                             print("El nombre del curso se ha modificado correctamente")
                             modificado =True
                         else:
                             print("Has cancelado la modificacion")
                     except:
                         print("Consulta por nombre no valida")
+                    finally: 
+                        if (cursor is not None):
+                            cursor.close()
                 else:
                     print("El nombre del curso no puede estar vacio")
             elif(opcion=="2"):
@@ -145,13 +148,15 @@ def modificarCurso(conexionBBDD):
                             cursor = conexionBBDD.cursor()
                             cursor.execute("UPDATE Cursos SET Descripcion=%s WHERE Codigo=%s", (descripcionCurso, codigoCurso))
                             conexionBBDD.commit()
-                            cursor.close()
                             print("La descripcion del curso se ha modificado correctamente")
                             modificado =True
                         else:
                             print("Has cancelado la modificacion")    
                     except:
                         print("Consulta por descripcion no valida")
+                    finally: 
+                        if (cursor is not None):
+                            cursor.close()
                 else:
                     print("La descripcion el curso no puede estar vacia")
                 
@@ -202,9 +207,12 @@ def busquedaCurso(conexionBBDD):
                     cursor = conexionBBDD.cursor()
                     cursor.execute("SELECT * FROM Cursos WHERE Nombre=%s", (nombreCurso))
                     filasTablaCurso = cursor.fetchall()
-                    cursor.close()
                 except:
                     print("Consulta por nombre no valida")
+                finally: 
+                    if (cursor is not None):
+                        cursor.close()
+
             else:
                 print("El nombre del curso no puede estar vacio")
         elif(opcion=="2"):
@@ -214,9 +222,11 @@ def busquedaCurso(conexionBBDD):
                     cursor = conexionBBDD.cursor()
                     cursor.execute("SELECT * FROM Cursos WHERE Descripcion=%s", (descripcionCurso))
                     filasTablaCurso = cursor.fetchall()
-                    cursor.close()
                 except:
                     print("Consulta por descripcion no valida")
+                finally: 
+                    if (cursor is not None):
+                        cursor.close()
             else:
                 print("La descripcion el curso no puede estar vacia")
             
@@ -282,6 +292,9 @@ def mostrarTodosCursos(conexionBBDD):
             
     except:
         print("No se han podido mostrar todos los cursos")
+    finally: 
+        if (cursor is not None):
+            cursor.close()
     
 def menuCursos(conexionBBDD):
     
