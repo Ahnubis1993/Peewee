@@ -6,8 +6,8 @@ from Vinculaciones import menuVinculaciones
 from Utilidades import confirmacion
 
 
-conexionBBDD = conectar()
-crearTablas(conexionBBDD)
+db = conectar()
+crearTablas(db)
 
 finMenuPrincipal = False
 
@@ -30,17 +30,17 @@ while(not finMenuPrincipal):
     opcion = input("Introduce una Opcion: ")
     
     if(opcion=="1"):
-        menuAlumnos(conexionBBDD)
+        menuAlumnos(db)
     elif(opcion=="2"):
-        menuProfesores(conexionBBDD)
+        menuProfesores(db)
     elif(opcion=="3"):
-        menuCursos(conexionBBDD)
+        menuCursos(db)
     elif(opcion=="4"):
-        menuVinculaciones(conexionBBDD)
+        menuVinculaciones(db)
     elif(opcion=="0"):
         if(confirmacion("Estas seguro que deseas salir del programa? (S/N): ")):
             finMenuPrincipal=True
-            conexionBBDD.close()
+            db.close()
             print("Finalizando programa")
         else:
             print("Has cancelado la finalzacion del programa")      

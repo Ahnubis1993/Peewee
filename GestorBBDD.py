@@ -1,4 +1,7 @@
 from peewee import *
+from ModeloAlumno import Alumno
+from ModeloCurso import Curso
+from ModeloProfesor import Profesor
 
 def leerConfiguracion():
     
@@ -51,6 +54,7 @@ def leerConfiguracion():
 def conectar():
     
     """
+    FIXME comentario desactualizado
     Se conecta a la bbdd mediante la configuracion obtenida en el fichero,
     establece conexion y crea la la bbdd correspodiente
 
@@ -61,22 +65,19 @@ def conectar():
     config = leerConfiguracion()
     
     try:
-        
         # Creamos conexion y accedemos a la configuracion proporcionada arriba
-        conexion = pymysql.connect(**config)
-        cursor = conexion.cursor()
-        # Si la base de datos no existe, crearla
+        db = MySQLDatabase(config["db"], user = config["user"], password = config["password"], host = config["host"], port = config["port"])
         
-        cursor.execute("CREATE DATABASE IF NOT EXISTS jorgeGomez_gustavoPlaza")
+        # Si la base de datos no existe se crea
+        if not db.database_exists():
+            db.create_database(config["db"])
         
-        # Seleccionar la base de datos
-        conexion.select_db('jorgeGomez_gustavoPlaza')
+        db.connect()
         print("Conexión establecida correctamente")
-        return conexion
+        return db
      
-    except pymysql.Error as e:
-        
-        print(f"Error de conexión: {e}") 
+    except OperationalError as e:
+        print(f"Error de conexión a la base de datos: {e}") 
         return None
     
 def crearTablaProfesores(conexion):
@@ -106,6 +107,7 @@ def crearTablaProfesores(conexion):
 def crearTablaAlumnos(conexion):
     
     """
+    FIXME DEPRECATED
     Crea la tabla alumnos con una clave primaria
     Se establecen los atributos a not null para que se obligue a su insercion
     y se crea un indice unico para el numero expediente
@@ -198,7 +200,7 @@ def crearTablaProfesoresCursos(conexion):
         
 
 
-def crearTablas(conexion):
+def crearTablas(db):
 
     """
     Se unen los metodos de creaciones de tablas para realizarlo desde 1 solo metodo
@@ -206,9 +208,12 @@ def crearTablas(conexion):
     :param parametro1: conexion a bbdd
     """
     
-    crearTablaAlumnos(conexion)
-    crearTablaProfesores(conexion)
-    crearTablaCursos(conexion)
-    crearTablaAlumnosCursos(conexion)
-    crearTablaProfesoresCursos(conexion)
+    db.create_tables([Alumno, Curso, Profesor])
+    
+    #FIXME mover de sitio los indexes
+    Alumno.add_index(('Nombre', 'Apellidos'), unique=True)
+    
+    #FIXME estas tablas o sobran, o hay que convertirlas tambien
+    crearTablaAlumnosCursos(db)
+    crearTablaProfesoresCursos(db)
     
