@@ -1,9 +1,9 @@
-import pymysql
+from peewee import *
 
 def leerConfiguracion():
     
     """
-    Lee un fichero por lineas para buscar mlos datos que se insertan 
+    Lee un fichero por lineas para buscar los datos que se insertan 
     en la configuracion del acceso a la bbddd
 
     :param parametro1: conexion a bbdd
@@ -39,6 +39,7 @@ def leerConfiguracion():
         puerto = "3306"
     
     config = {
+    'db': 'jorgeGomez_gustavoPlaza_PeeWee',#FIXME Placeholder, meter la db en el fichero de config
     'user': usuario,
     'password': contrasenia,
     'host': host,
