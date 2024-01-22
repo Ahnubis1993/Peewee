@@ -1,25 +1,28 @@
+import peewee
 from Utilidades import confirmacion
-from pymysql import IntegrityError
+from peewee import IntegrityError
+from ModeloProfesor import Profesor
 
 
-def insertarProfesor(conexionBBDD):
+def insertarProfesor():
     
     """
     Da de alta un profesor, si alguno de los atributos a asignar falla 5 veces, no se crea el profesor 
     y se pide si quieres dar de alta otro
 
-    :param parametro1: conexion a bbdd
     """
-    
-    
+
     fin = False
+
     while (not fin):
+
         print("--- Alta Profesor ---")
     
         intentos = 5
         correcto = False
     
         while(not correcto and intentos>0):
+
             dniProfesor = input("Introduce el DNI del profesor: ").strip()
             if(len(dniProfesor)==9 and dniProfesor[8:].isdigit and dniProfesor[8:].isalpha): 
                 correcto = True   
@@ -69,23 +72,16 @@ def insertarProfesor(conexionBBDD):
             
             
         if(correcto):
+
             try:
-                cursor = conexionBBDD.cursor()
-                cursor.execute("INSERT INTO Profesores (dni, nombre, direccion, telefono) VALUES (%s, %s, %s, %s)",
-                            (dniProfesor.upper(), nombreProfesor, direccionProfesor, telefonoProfesor))
-                conexionBBDD.commit()
+                Profesor.create(dni=dniProfesor, nombre=nombreProfesor, direccion=direccionProfesor,telefono=telefonoProfesor)
                 print("Alta realizada correctamente")
                     
             except IntegrityError as e:
-                if "Dni_UNIQUE" in str(e):
+                if "UNIQUE constraint " in str(e):
                     print("Ya existe un profesor con el mismo DNI.")
                 else:
                     print("Error al introducir el profesor en la base de datos")
-            except:
-                print("Profesor no dado de alta, fallo al introducir el profesor en la base de datos")
-            finally: 
-                if (cursor is not None):
-                    cursor.close()
 
         else:
             print("Has introducido el dato mal 5 veces. Alta cancelada.")
@@ -94,41 +90,35 @@ def insertarProfesor(conexionBBDD):
             fin = True
             print("Fin de alta de Profesor")
             
-def eliminarProfesor(conexionBBDD):
+def eliminarProfesor():
     
     """
     Elimina un profesor mediante el id que es buscado por el metodo busquedaProfesor
     Se obtiene el id del mismo y se elimina de las correspondientes tablas en la que se encuentre
 
-    :param parametro1: conexion a bbdd
     """
     
     print("--- Baja Profesor ---")
-    idProfesor = busquedaProfesor(conexionBBDD)
+    idProfesor = busquedaProfesor()
+
     if(idProfesor != -1):
+
         if(confirmacion("Estas seguro de que deseas eliminar el profesor con id '"+str(idProfesor)+"'? (S/N): ")):
-            try:
-                cursor = conexionBBDD.cursor()
-                cursor.execute("DELETE FROM Profesores WHERE Id=%s",(idProfesor))
-                conexionBBDD.commit()
+                Profesor.delete().where(Profesor.Id == idProfesor).execute()
                 print("Profesor con id "+str(idProfesor)+" ha sido dado de baja")
-            except:
-                print("Error al eliminar el profesor de la base de datos")
-            finally:
-                if (cursor is not None):
-                    cursor.close()
         else:
             print("Profesor con id '"+str(idProfesor)+"' no ha sido dado de baja")
+
     else:
         print("No hay resultados de busqueda. Fin baja profesor")
     
 def modificarProfesor(conexionBBDD):
     
     """
+
     Modifica un profesor que es buscado, mediante el id
     del profesor, seleccionamos el atributo que se desee modificar siempre y cuando se acepte la confirmacion
 
-    :param parametro1: conexion a bbdd
     """
     
     print("--- Modificacion Profesor ---")
@@ -240,7 +230,7 @@ def modificarProfesor(conexionBBDD):
     else:
         print("No hay resultados de busqueda. Fin modificar profesor")
         
-def busquedaProfesor(conexionBBDD):
+def busquedaProfesor():
     
     """
     Busca un profesor mediante cualquier atributo del mismo, si es localizado se devuelve el id 
@@ -253,81 +243,53 @@ def busquedaProfesor(conexionBBDD):
     
     idProfesor = -1
     finBusquedaProfesor = False
-    filasTablaProfesor = []
     
     while(not finBusquedaProfesor):
         opcion = menuAtributos()
         
         if(opcion=="1"):
+
             dniProfesor = input("Introduce dni del profesor a buscar: ").strip()
             if(len(dniProfesor)==9 and dniProfesor[8:].isdigit and dniProfesor[8:].isalpha):
-                try:
-                    cursor = conexionBBDD.cursor()
-                    cursor.execute("SELECT * FROM Profesores WHERE Dni=%s", (dniProfesor))
-                    filasTablaProfesor = cursor.fetchall()
-                except:
-                    print("Consulta por Dni no valida")
-                finally:
-                    if (cursor is not None):
-                        cursor.close()
+                profesores = Profesor.select().where(Profesor.Dni == dniProfesor)
             else:
                 print("El dni debe esta formado por 8 digitos y 1 letra")
+
         elif(opcion=="2"):
+
             nombreProfesor = input("Introduce nombre del profesor a buscar: ").strip()
             if(nombreProfesor != ""):
-                try:
-                    cursor = conexionBBDD.cursor()
-                    cursor.execute("SELECT * FROM Profesores WHERE Nombre=%s", (nombreProfesor))
-                    filasTablaProfesor = cursor.fetchall()
-                except:
-                    print("Consulta por Nombre no valida")
-                finally:
-                    if (cursor is not None):
-                        cursor.close()
+                profesores = Profesor.select().where(Profesor.Nombre == nombreProfesor)
             else:
                 print("El nombre no puede estar vacio")
             
         elif(opcion=="3"):
+
             direccionProfesor = input("Introduce direccion del profesor a buscar").strip()
             if(direccionProfesor != ""):
-                try:
-                    cursor = conexionBBDD.cursor()
-                    cursor.execute("SELECT * FROM Profesores WHERE Direccion=%s",(direccionProfesor))
-                    filasTablaProfesor = cursor.fetchall()
-                    cursor.close()
-                except:
-                    print("Consulta por Direccion no valida")
-                finally:
-                    if (cursor is not None):
-                        cursor.close()
+                profesores = Profesor.select().where(Profesor.Direccion == direccionProfesor)
             else:
                 print("La direccion no puede estar vacia")
         
         elif(opcion=="4"):
+
             telefonoProfesor = input("Introduce telefono del profesor a buscar: ").strip()
             if(telefonoProfesor.isdigit() and len(telefonoProfesor)==9):
-                try:
-                    cursor = conexionBBDD.cursor()
-                    cursor.execute("SELECT * FROM Profesores WHERE Telefono=%s", (telefonoProfesor))
-                    filasTablaProfesor = cursor.fetchall()
-                except:
-                    print("Consulta por Telefono no valida")
-                finally:
-                    if (cursor is not None):
-                        cursor.close()
+                profesores = Profesor.select().where(Profesor.Telefono == telefonoProfesor)
             else:
                 print("El telefono debe tener una longitud de 9 digitos")
             
         elif(opcion=="0"):
+
             finBusquedaProfesor = True
             print("Fin busqueda Profesor")
         else:
             print("Opcion no valida")
             
-        if(not finBusquedaProfesor and filasTablaProfesor):
+        if(not finBusquedaProfesor and profesores):
+
             print("--- Resultado ---")
-            
-            for f in filasTablaProfesor:
+            for f in profesores:
                 print("Id_Profesor:"+str(f[0])+"\n"
                       "Dni:"+f[1]+"\n"
                       "Nombre:"+f[2]+"\n"
@@ -335,20 +297,26 @@ def busquedaProfesor(conexionBBDD):
                       "Telefono:"+str(f[4])+"\n"
                       "--------------------------------\n")
             
-            if(len(filasTablaProfesor)>1):
+            if(len(profesores)>1):
+
                 finIdProfesor = False
                 while(not finIdProfesor):
                     idProfesorBuscar = input("Introduce el id del profesor a elegir")
+
                     if(idProfesorBuscar.isdigit()):
-                        idProfesorEncontrado = [fila for fila in filasTablaProfesor if(fila[0]==int(idProfesorBuscar))]
+                        idProfesorEncontrado = [fila for fila in profesores if(fila[0]==int(idProfesorBuscar))]
+
                         if(idProfesorEncontrado):
                             idProfesor = idProfesorEncontrado[0]
                             finBusquedaProfesor = True
                     else:
                         print("Tienes que insertar un numero")
-            elif(len(filasTablaProfesor)==1):
-                idProfesor = filasTablaProfesor[0][0]
+
+            elif(len(profesores)==1):
+
+                idProfesor = profesores[0][0]
                 finBusquedaProfesor = True
+
         else:
             if(not confirmacion("No se han encontrado resultados. Deseas buscar de nuevo? (S/N): ")):
                 finBusquedaProfesor = True
@@ -405,7 +373,7 @@ def menuAtributos():
     opcion = input("Introduce una opcion: ").strip()
     return opcion
     
-def menuProfesores(conexionBBDD):
+def menuProfesores():
     
     """
     Menu de profesores donde se pueden elegir las diferentes operaciones de gestion relacionados con el mismo
@@ -428,17 +396,17 @@ def menuProfesores(conexionBBDD):
         opcion = input("Introduce una Opcion: ").strip()
         
         if(opcion=="1"):
-            insertarProfesor(conexionBBDD)
+            insertarProfesor()
         elif(opcion=="2"):
-            eliminarProfesor(conexionBBDD)
+            eliminarProfesor()
         elif(opcion=="3"):
-            modificarProfesor(conexionBBDD)
+            modificarProfesor()
         elif(opcion=="4"):
-            busquedaProfesor(conexionBBDD)
+            busquedaProfesor()
         elif(opcion=="5"):
-            mostrarTodosProfesores(conexionBBDD)
+            mostrarTodosProfesores()
         elif(opcion=="0"):
             finMenuProfesor = True
             print("Regresando a Menu Principal")
         else:
-            print("Opcion no valida")       
+            print("Opcion no valida")

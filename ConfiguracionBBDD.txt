@@ -1,4 +1,5 @@
+db:jorgeGomez_gustavoPlaza_Pewee
 usuario:root
-contrasenia:alumno
+contrasenia:gustavo
 host:localhost
-puerto:3306
+puerto:3310

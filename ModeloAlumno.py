@@ -1,5 +1,5 @@
 from peewee import *
-from GestorBBDD import leerConfiguracion
+from Utilidades import leerConfiguracion
 
 class Alumno(Model):
     
@@ -12,7 +12,13 @@ class Alumno(Model):
     
     class Meta:
         config = leerConfiguracion()
-        database = MySQLDatabase(config["db"], user = config["user"], password = config["password"], host = config["host"], port = config["port"])
+        database = MySQLDatabase(
+            config["db"],
+            user=config["user"],
+            password=config["password"],
+            host=config["host"],
+            port=config["port"]
+        )
         indexes = (
             (('Nombre', 'Apellidos'), True),
         )

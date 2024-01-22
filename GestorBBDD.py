@@ -2,86 +2,70 @@ from peewee import *
 from ModeloAlumno import Alumno
 from ModeloCurso import Curso
 from ModeloProfesor import Profesor
+from Utilidades import leerConfiguracion
+import pymysql
 
-def leerConfiguracion():
-    
-    """
-    Lee un fichero por lineas para buscar los datos que se insertan 
-    en la configuracion del acceso a la bbddd
+def crearBBDDSQL():
 
-    :param parametro1: conexion a bbdd
     """
-    
-    # Leemos fichero configuracion    
-    file = open("ConfiguracionBBDD.txt","r")
-    # Leo y cargo las lineas en la variable archivoConfiguracion
-    archivoConfiguracion = file.readlines()
-    
-    # Inserta y crea las variables para la configuracion de la BBDD (independientemnte del orden en el archivo)
-    for linea in archivoConfiguracion:
-        
-        lineaDividida = linea.split(":")
-        
-        if(lineaDividida[0].strip()=="usuario"):
-            usuario=lineaDividida[1].strip()
-        elif(lineaDividida[0].strip()=="contrasenia"):
-            contrasenia=lineaDividida[1].strip()
-        elif(lineaDividida[0].strip()=="host"):
-            host=lineaDividida[1].strip()
-        elif(lineaDividida[0].strip()=="puerto"):
-            puerto=lineaDividida[1].strip()
-            
-    # Si alguno de los campos esta vacio se establece su valor por defecto
-    if(usuario == ""):
-        usuario = "root"
-    if(contrasenia == ""):
-        contrasenia = "alumno"
-    if(host == ""):
-        host = "localhost"
-    if(puerto == ""):
-        puerto = "3306"
-    
-    config = {
-    'db': 'jorgeGomez_gustavoPlaza_PeeWee',#FIXME Placeholder, meter la db en el fichero de config
-    'user': usuario,
-    'password': contrasenia,
-    'host': host,
-    'port': int(puerto),
-    } 
+    Se conecta a la bbdd con SQL mediante la configuracion obtenida en el fichero,
+    establece conexion y crea la la bbdd correspodiente, la usa y cierra la conexion
 
-    return config
-          
-def conectar():
-    
     """
-    FIXME comentario desactualizado
-    Se conecta a la bbdd mediante la configuracion obtenida en el fichero,
-    establece conexion y crea la la bbdd correspodiente
 
-    :param parametro1: conexion a bbdd
-    """
-    
     # Leemos la configuracion estructurada
     config = leerConfiguracion()
-    
+
     try:
-        # Creamos conexion y accedemos a la configuracion proporcionada arriba
-        db = MySQLDatabase(config["db"], user = config["user"], password = config["password"], host = config["host"], port = config["port"])
-        
-        # Si la base de datos no existe se crea
-        if not db.database_exists():
-            db.create_database(config["db"])
-        
-        db.connect()
-        print("Conexión establecida correctamente")
-        return db
-     
+
+        # Conexion MySQL
+        conexion = pymysql.connect(**config)
+        cursor = conexion.cursor()
+
+        # Crear la BBDD con MySQL
+        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {config['db']}")
+        print(f"Base de datos {config['db']} creada correctamente.")
+
+        # Usar BBDD creada
+        cursor.execute(f"USE {config['db']}")
+
+        # Cerramos el cursor y la conexion
+        cursor.close()
+        conexion.close()
     except OperationalError as e:
-        print(f"Error de conexión a la base de datos: {e}") 
+        print(f"Error de conexión a la base de datos con pymysql: {e}")
+
+
+def conectarPewee():
+
+    """
+    Se conecta a la bbdd con Pewee mediante la configuracion obtenida en el fichero,
+    establece conexion a la BBDD que se creo con MySQL y se conecta
+
+    """
+
+    config = leerConfiguracion()
+
+    try:
+        
+        db = MySQLDatabase(
+            config["db"],
+            user=config["user"],
+            password=config["password"],
+            host=config["host"],
+            port=config["port"],
+        )
+
+        db.connect()
+        print("Conexión establecida correctamente con peewee")
+        return db
+
+    except OperationalError as e:
+        print(f"Error de conexión a la base de datos con peewee: {e}")
         return None
-    
+
+
 def crearTablaProfesores(conexion):
-    
     """
     Crea la tabla profesores con una clave primaria autoincrementada
     Se establecen los atributos a not null para que se obligue a su insercion
@@ -89,23 +73,23 @@ def crearTablaProfesores(conexion):
 
     :param parametro1: conexion a bbdd
     """
-    
+
     try:
         cursor = conexion.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS Profesores("
-            "Id INT AUTO_INCREMENT PRIMARY KEY,"
-            "Dni VARCHAR(9) NOT NULL," 
-            "Nombre VARCHAR(25) NOT NULL,"
-            "Direccion VARCHAR(25) NOT NULL,"
-            "Telefono VARCHAR(9) NOT NULL)")
+                       "Id INT AUTO_INCREMENT PRIMARY KEY,"
+                       "Dni VARCHAR(9) NOT NULL,"
+                       "Nombre VARCHAR(25) NOT NULL,"
+                       "Direccion VARCHAR(25) NOT NULL,"
+                       "Telefono VARCHAR(9) NOT NULL)")
         cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_dni ON Profesores (Dni)")
         conexion.commit()
         cursor.close()
     except Exception as e:
-        print("Tabla Profesores no creada correctamente: "+str(e))
-    
+        print("Tabla Profesores no creada correctamente: " + str(e))
+
+
 def crearTablaAlumnos(conexion):
-    
     """
     FIXME DEPRECATED
     Crea la tabla alumnos con una clave primaria
@@ -114,46 +98,47 @@ def crearTablaAlumnos(conexion):
 
     :param parametro1: conexion a bbdd
     """
-    
+
     try:
         cursor = conexion.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS Alumnos("
-            "Num_Expediente INT PRIMARY KEY," 
-            "Nombre VARCHAR(25) NOT NULL,"
-            "Apellidos VARCHAR(25) NOT NULL,"
-            "Telefono VARCHAR(9) NOT NULL,"
-            "Direccion VARCHAR(25) NOT NULL,"
-            # Formato fecha dd/mm/yyyy
-            "Fecha_Nacimiento DATE NOT NULL)"
-            )
-        cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_nombre_apellidos ON Alumnos (Nombre, Apellidos)")#Para asegurarse de que no hay dos alumnos con el mismo nombre y apellidos
+                       "Num_Expediente INT PRIMARY KEY,"
+                       "Nombre VARCHAR(25) NOT NULL,"
+                       "Apellidos VARCHAR(25) NOT NULL,"
+                       "Telefono VARCHAR(9) NOT NULL,"
+                       "Direccion VARCHAR(25) NOT NULL,"
+                       # Formato fecha dd/mm/yyyy
+                       "Fecha_Nacimiento DATE NOT NULL)"
+                       )
+        cursor.execute(
+            "CREATE UNIQUE INDEX IF NOT EXISTS idx_nombre_apellidos ON Alumnos (Nombre, Apellidos)")  # Para asegurarse de que no hay dos alumnos con el mismo nombre y apellidos
         conexion.commit()
         cursor.close()
     except Exception as e:
-        print("Tabla Alumnos no creada correctamente: "+str(e))
-    
+        print("Tabla Alumnos no creada correctamente: " + str(e))
+
+
 def crearTablaCursos(conexion):
-    
     """
     Crea la tabla cursos con una clave primaria autoincrementada
     Se establecen los atributos a not null para que se obligue a su insercion
 
     :param parametro1: conexion a bbdd
     """
-    
+
     try:
         cursor = conexion.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS Cursos("
-            "Codigo INT AUTO_INCREMENT PRIMARY KEY," 
-            "Nombre VARCHAR(25) NOT NULL UNIQUE,"
-            "Descripcion VARCHAR(25) NOT NULL)")
+                       "Codigo INT AUTO_INCREMENT PRIMARY KEY,"
+                       "Nombre VARCHAR(25) NOT NULL UNIQUE,"
+                       "Descripcion VARCHAR(25) NOT NULL)")
         conexion.commit()
-        cursor.close() 
+        cursor.close()
     except Exception as e:
-        print("Tabla Cursos no creada correctamente: "+str(e))
-        
+        print("Tabla Cursos no creada correctamente: " + str(e))
+
+
 def crearTablaAlumnosCursos(conexion):
-    
     """
     Crea la tabla alumnos_cursos con 2 columnas de los id de las tablas principales,
     ambas columnas son clave primaria y foranea a la vez, ademas se crea un borrado y modificacion en cascada
@@ -161,22 +146,22 @@ def crearTablaAlumnosCursos(conexion):
 
     :param parametro1: conexion a bbdd
     """
-    
+
     try:
         cursor = conexion.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS Alumnos_Cursos("
-            "Num_Expediente INT NOT NULL,"
-            "Id_Curso INT NOT NULL,"
-            "FOREIGN KEY (Num_Expediente) REFERENCES Alumnos(Num_Expediente) ON DELETE CASCADE ON UPDATE CASCADE,"
-            "FOREIGN KEY (Id_Curso) REFERENCES Cursos(Codigo) ON DELETE CASCADE ON UPDATE CASCADE,"
-            "PRIMARY KEY (Num_Expediente,Id_Curso))")
+                       "Num_Expediente INT NOT NULL,"
+                       "Id_Curso INT NOT NULL,"
+                       "FOREIGN KEY (Num_Expediente) REFERENCES Alumnos(Num_Expediente) ON DELETE CASCADE ON UPDATE CASCADE,"
+                       "FOREIGN KEY (Id_Curso) REFERENCES Cursos(Codigo) ON DELETE CASCADE ON UPDATE CASCADE,"
+                       "PRIMARY KEY (Num_Expediente,Id_Curso))")
         conexion.commit()
         cursor.close()
     except Exception as e:
         print("Tabla Alumnos_Cursos no creada correctamente: " + str(e))
-        
+
+
 def crearTablaProfesoresCursos(conexion):
-    
     """
     Crea la tabla profesores_cursos con 2 columnas de los id de las tablas principales,
     ambas columnas son clave primaria y foranea a la vez, ademas se crea un borrado y modificacion en cascada
@@ -184,36 +169,34 @@ def crearTablaProfesoresCursos(conexion):
 
     :param parametro1: conexion a bbdd
     """
-    
+
     try:
         cursor = conexion.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS Profesores_Cursos("
-            "Id_Profesor INT NOT NULL,"
-            "Id_Curso INT NOT NULL,"
-            "FOREIGN KEY (Id_Profesor) REFERENCES Profesores(Id) ON DELETE CASCADE ON UPDATE CASCADE,"
-            "FOREIGN KEY (Id_Curso) REFERENCES Cursos(Codigo) ON DELETE CASCADE ON UPDATE CASCADE,"
-            "PRIMARY KEY (Id_Profesor,Id_Curso))")
+                       "Id_Profesor INT NOT NULL,"
+                       "Id_Curso INT NOT NULL,"
+                       "FOREIGN KEY (Id_Profesor) REFERENCES Profesores(Id) ON DELETE CASCADE ON UPDATE CASCADE,"
+                       "FOREIGN KEY (Id_Curso) REFERENCES Cursos(Codigo) ON DELETE CASCADE ON UPDATE CASCADE,"
+                       "PRIMARY KEY (Id_Profesor,Id_Curso))")
         conexion.commit()
         cursor.close()
     except Exception as e:
         print("Tabla Profesores_Cursos no creada correctamente: " + str(e))
-        
 
 
 def crearTablas(db):
-
     """
     Se unen los metodos de creaciones de tablas para realizarlo desde 1 solo metodo
 
     :param parametro1: conexion a bbdd
     """
-    
-    db.create_tables([Alumno, Curso, Profesor])
-    
-    #FIXME mover de sitio los indexes
-    Alumno.add_index(('Nombre', 'Apellidos'), unique=True)
-    
-    #FIXME estas tablas o sobran, o hay que convertirlas tambien
-    crearTablaAlumnosCursos(db)
-    crearTablaProfesoresCursos(db)
-    
+
+    try:
+        db.create_tables([Alumno, Curso, Profesor])
+    except OperationalError as e:
+        print(f"Error al crear las tablas: {e}")
+
+    # FIXME estas tablas o sobran, o hay que convertirlas tambien
+    # crearTablaAlumnosCursos(db)
+    # crearTablaProfesoresCursos(db)
+

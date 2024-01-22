@@ -1,5 +1,6 @@
 from pymysql import IntegrityError
 from Utilidades import confirmacion
+from ModeloCurso import Curso
 
 def insertarCurso(conexionBBDD):
     

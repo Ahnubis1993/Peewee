@@ -1,5 +1,6 @@
 from Utilidades import confirmacion
 from pymysql import IntegrityError
+from ModeloAlumno import Alumno
 import re
 
 def insertarAlumno(conexionBBDD):
