@@ -19,7 +19,7 @@ def crearBBDDSQL():
     try:
 
         # Conexion MySQL
-        conexion = pymysql.connect(**config)
+        conexion = pymysql.connect(user=config["user"], password=config["password"], host=config["host"], port=config["port"])
         cursor = conexion.cursor()
 
         # Crear la BBDD con MySQL

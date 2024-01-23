@@ -41,7 +41,7 @@ def leerConfiguracion():
         puerto = "3306"
 
     config = {
-        'db': baseDatos,  # FIXME Placeholder, meter la db en el fichero de config
+        'db': baseDatos,
         'user': usuario,
         'password': contrasenia,
         'host': host,

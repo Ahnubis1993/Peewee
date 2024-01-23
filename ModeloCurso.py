@@ -1,5 +1,5 @@
 from peewee import *
-from GestorBBDD import leerConfiguracion
+from Utilidades import leerConfiguracion
 
 class Curso(Model):
     Codigo = AutoField(primary_key=True)
