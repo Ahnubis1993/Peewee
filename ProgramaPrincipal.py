@@ -35,7 +35,7 @@ while(not finMenuPrincipal):
         opcion = "0"
 
     if(opcion=="1"):
-        menuAlumnos(db)
+        menuAlumnos()
     elif(opcion=="2"):
         menuProfesores()
     elif(opcion=="3"):

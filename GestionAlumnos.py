@@ -3,13 +3,12 @@ from pymysql import IntegrityError
 from ModeloAlumno import Alumno
 import re
 
-def insertarAlumno(conexionBBDD):
+def insertarAlumno():
     
     """
     Da de alta un alumno, si alguno de los atributos a asignar falla 5 veces, no se crea el alumno 
     y se pide si quieres dar de alta otro
 
-    :param parametro1: conexion a bbdd
     """
     
     fin = False
@@ -96,10 +95,7 @@ def insertarAlumno(conexionBBDD):
                         
         if (correcto):
             try:
-                cursor = conexionBBDD.cursor()
-                cursor.execute("INSERT INTO Alumnos (Num_Expediente, nombre, apellidos, telefono, direccion, Fecha_Nacimiento) VALUES (%s, %s, %s, %s, %s, %s)", 
-                            (expediente, nombre, apellidos, telefono, direccion, fechaNac))
-                conexionBBDD.commit()
+                Alumno.create(Num_Expediente = expediente, Nombre = nombre, Apellidos = apellidos, Telefono = telefono, Direccion = direccion, Fecha_Nacimiento = fechaNac)
                 print("Alta realizada correctamente.")
                 
             except IntegrityError as e:
@@ -117,9 +113,6 @@ def insertarAlumno(conexionBBDD):
             except:
                 print("Alumno no dado de alta, fallo al introducir el alumno en la base de datos")
                 
-            finally:
-                if (cursor is not None):
-                    cursor.close()
         else:
             print("Has introducido el dato mal 5 veces. Alta cancelada.")
             
@@ -127,12 +120,11 @@ def insertarAlumno(conexionBBDD):
             fin = True
             print("Fin de alta de alumno")
 
-def eliminarAlumno(conexionBBDD):
+def eliminarAlumno():
     """
     Elimina un alumno mediante el id que es buscado por el metodo busquedaAlumno
     Se obtiene el expediente del mismo y se elimina de las correspondientes tablas en la que se encuentre
 
-    :param parametro1: conexion a bbdd
     """
     print("--- Baja Alumno ---")
     expediente = busquedaAlumno(conexionBBDD)
@@ -268,13 +260,12 @@ def modificarAlumno(conexionBBDD):
         print("No hay resultados de busqueda. Fin de modificacion de alumno")
     cursor.close()
     
-def busquedaAlumno(conexionBBDD, alumnoUnico = False):
+def busquedaAlumno(alumnoUnico = False):
     
     """
     Busca un alumno mediante cualquier atributo del mismo, si es localizado se devuelve el expediente 
     pera poder gestionarlo en otros metodos
 
-    :param parametro1: conexion a bbdd
     """
     
     print("--- Busqueda Alumno ---")
@@ -289,8 +280,7 @@ def busquedaAlumno(conexionBBDD, alumnoUnico = False):
             expediente = input("Introduce el Numero de Expediente a buscar: ").strip()
             if (expediente.isdigit()):
                 try:
-                    cursor = conexionBBDD.cursor()
-                    cursor.execute("SELECT * FROM Alumnos WHERE Num_Expediente='" + expediente +"'")
+                    query = Alumno.select().where(Alumno.Num_Expediente == expediente)
                 except:
                     print("Consulta por Numero de Expediente no valida")
             else:
@@ -300,8 +290,7 @@ def busquedaAlumno(conexionBBDD, alumnoUnico = False):
             nombre = input("Introduce el Nombre a buscar: ").strip()
             if(nombre!= ""):
                 try:
-                    cursor = conexionBBDD.cursor()
-                    cursor.execute("SELECT * FROM Alumnos WHERE Nombre='"+nombre+"'")
+                    query = Alumno.select().where(Alumno.Nombre == nombre)
                 except:
                     print("Consulta por Nombre no valida")
             else:
@@ -311,8 +300,7 @@ def busquedaAlumno(conexionBBDD, alumnoUnico = False):
             apellidos = input("Introduce los Apellidos a buscar: ").strip()
             if(apellidos!= ""):
                 try:
-                    cursor = conexionBBDD.cursor()
-                    cursor.execute("SELECT * FROM Alumnos WHERE Apellidos='"+apellidos+"'")
+                    query = Alumno.select().where(Alumno.Apellidos == apellidos)
                 except:
                     print("Consulta por Apellidos no valida")
             else:
@@ -322,8 +310,7 @@ def busquedaAlumno(conexionBBDD, alumnoUnico = False):
             telefono = input("Introduce el Telefono a buscar: ").strip()
             if(telefono.isdigit() and len(telefono)==9):
                 try:
-                    cursor = conexionBBDD.cursor()
-                    cursor.execute("SELECT * FROM Alumnos WHERE Telefono='"+telefono+"'")
+                    query = Alumno.select().where(Alumno.Telefono == telefono)
                 except:
                     print("Consulta por Telefono no valida")
             else:
@@ -333,8 +320,7 @@ def busquedaAlumno(conexionBBDD, alumnoUnico = False):
             direccion = input("Introduce la direccion a buscar: ").strip()
             if(direccion!= ""):
                 try:
-                    cursor = conexionBBDD.cursor()
-                    cursor.execute("SELECT * FROM Alumnos WHERE Direccion='"+direccion+"'")
+                    query = Alumno.select().where(Alumno.Direccion == direccion)
                 except:
                     print("Consulta por Direccion no valida")
             else:
@@ -345,8 +331,7 @@ def busquedaAlumno(conexionBBDD, alumnoUnico = False):
             
             if re.match("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", fechaNac):
                 try:
-                    cursor = conexionBBDD.cursor()
-                    cursor.execute("SELECT * FROM Alumnos WHERE Fecha_Nacimiento='"+fechaNac+"'")
+                    query = Alumno.select().where(Alumno.Fecha_Nacimiento == fechaNac)
                 except:
                     print("Consulta por Fecha de Nacimiento no valida")
             else:
@@ -360,33 +345,31 @@ def busquedaAlumno(conexionBBDD, alumnoUnico = False):
             
         if(not finBusqueda):
             print("--- Resultado de la Busqueda ---")
-            filas = cursor.fetchall()
-            cursor.close()
             
-            for f in filas:
-                print("Numero de expediente:"+str(f[0])+"\n"
-                      "Nombre:"+f[1]+"\n"
-                      "Apellidos:"+f[2]+"\n"
-                      "Telefono:"+f[3]+"\n"
-                      "Direccion:"+f[4]+"\n"
-                      "Fecha de Nacimiento:"+str(f[5])+"\n"
+            for a in query:
+                print("Numero de expediente:"+str(a.Num_Expediente)+"\n"
+                      "Nombre:"+a.Nombre+"\n"
+                      "Apellidos:"+a.Apellidos+"\n"
+                      "Telefono:"+a.Telefono+"\n"
+                      "Direccion:"+a.Direccion+"\n"
+                      "Fecha de Nacimiento:"+str(a.Fecha_Nacimiento)+"\n"
                       "--------------------------------\n")
             
-            if(len(filas)>1 and alumnoUnico):
+            if(len(query)>1 and alumnoUnico):#TODO Revisar len(query)
                 finAlumnoUnico = False
                 while(not finAlumnoUnico):
                     expediente = input("Introduce el numero de expediente del alumno a elegir")
                     if(expediente.isdigit()):
-                        numExpedienteEncontrado = [fila for fila in filas if(fila[0]==int(expediente))]
+                        numExpedienteEncontrado = [alumno for alumno in query if(alumno.Num_Expediente == int(expediente))]
                         if(numExpedienteEncontrado):
                             finBusqueda = True
                             numExpediente = numExpedienteEncontrado[0]
                     else:
                         print("Tienes que insertar un numero")
-            elif(len(filas)==1):
+            elif(len(query)==1):
                 finBusqueda = True
-                numExpediente = filas[0][0]
-            elif (len(filas)==0):
+                numExpediente = query[0].Num_Expediente
+            elif (len(query)==0):
                 if(not confirmacion("No se han encontrado resultados. Deseas buscar de nuevo? (S/N): ")):
                     finBusqueda = True
     return numExpediente
@@ -445,7 +428,7 @@ def menuAtributos():
             print("Opcion no valida")
     return opcion
 
-def menuAlumnos(conexionBBDD):
+def menuAlumnos():
     
     """
     Menu de alumnos donde se pueden elegir las diferentes operaciones de gestion relacionados con el mismo
@@ -468,15 +451,15 @@ def menuAlumnos(conexionBBDD):
         opcion = input("Introduce una Opcion: ").strip()
         
         if(opcion=="1"):
-            insertarAlumno(conexionBBDD)
+            insertarAlumno()
         elif(opcion=="2"):
-            eliminarAlumno(conexionBBDD)
+            eliminarAlumno()
         elif(opcion=="3"):
-            modificarAlumno(conexionBBDD)
+            modificarAlumno()
         elif(opcion=="4"):
-            busquedaAlumno(conexionBBDD)
+            busquedaAlumno()
         elif(opcion=="5"):
-            mostrarTodos(conexionBBDD)
+            mostrarTodos()
         elif(opcion=="0"):
             finMenuAlumno = True
             print("Regresando a Menu Principal")
