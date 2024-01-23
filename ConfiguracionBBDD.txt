@@ -1,6 +1,0 @@
-db:jorgeGomez_gustavoPlaza_Pewee
-usuario:root
-contrasenia:my-secret-pw
-host:localhost
-puerto:3306
-A
