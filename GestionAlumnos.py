@@ -274,8 +274,9 @@ def busquedaAlumno(alumnoUnico = False):
     finBusqueda = False
     
     while(not finBusqueda):
+        query = None
+        cantidadResultados = 0
         opcion = menuAtributos()
-        
         if (opcion == "1"):
             expediente = input("Introduce el Numero de Expediente a buscar: ").strip()
             if (expediente.isdigit()):
@@ -342,20 +343,23 @@ def busquedaAlumno(alumnoUnico = False):
             print("Fin de busqueda de Alumno")
         else:
             print("Opcion no valida")
-            
+             
         if(not finBusqueda):
+            if (query is not None):
+                cantidadResultados = query.count()
+            
             print("--- Resultado de la Busqueda ---")
+            if (cantidadResultados > 0):
+                for alumno in query:
+                    print("Numero de expediente:"+str(alumno.Num_Expediente)+"\n"
+                        "Nombre:"+alumno.Nombre+"\n"
+                        "Apellidos:"+alumno.Apellidos+"\n"
+                        "Telefono:"+alumno.Telefono+"\n"
+                        "Direccion:"+alumno.Direccion+"\n"
+                        "Fecha de Nacimiento:"+str(alumno.Fecha_Nacimiento)+"\n"
+                        "--------------------------------\n")
             
-            for a in query:
-                print("Numero de expediente:"+str(a.Num_Expediente)+"\n"
-                      "Nombre:"+a.Nombre+"\n"
-                      "Apellidos:"+a.Apellidos+"\n"
-                      "Telefono:"+a.Telefono+"\n"
-                      "Direccion:"+a.Direccion+"\n"
-                      "Fecha de Nacimiento:"+str(a.Fecha_Nacimiento)+"\n"
-                      "--------------------------------\n")
-            
-            if(len(query)>1 and alumnoUnico):#TODO Revisar len(query)
+            if(cantidadResultados >1 and alumnoUnico):#TODO Revisar len(query)
                 finAlumnoUnico = False
                 while(not finAlumnoUnico):
                     expediente = input("Introduce el numero de expediente del alumno a elegir")
@@ -366,38 +370,35 @@ def busquedaAlumno(alumnoUnico = False):
                             numExpediente = numExpedienteEncontrado[0]
                     else:
                         print("Tienes que insertar un numero")
-            elif(len(query)==1):
+            elif(cantidadResultados==1):#TODO Revisar si es necesario esta condicion
                 finBusqueda = True
                 numExpediente = query[0].Num_Expediente
-            elif (len(query)==0):
+            elif (cantidadResultados==0):#TODO Esto quizas sea un else sencillo en vez de elif
                 if(not confirmacion("No se han encontrado resultados. Deseas buscar de nuevo? (S/N): ")):
                     finBusqueda = True
     return numExpediente
 
-def mostrarTodos(conexionBBDD):
+def mostrarTodos():
     
     """
     Muestra todos los alumnos que haya en la tabla Alumnos
-
-    :param parametro1: conexion a bbdd
+    
     """
     
     print("--- Mostrando todos los alumnos ---")
     try:
-        cursor=conexionBBDD.cursor()
-        cursor.execute("SELECT * FROM Alumnos")
-        filas = cursor.fetchall()
+        query = Alumno.select()
         
-        if (len(filas)==0):
+        if (len(query)==0):
             print("No hay alumnos registrados")
         
-        for f in filas:
-                print("Numero de expediente:"+str(f[0])+"\n"
-                      "Nombre:"+f[1]+"\n"
-                      "Apellidos:"+f[2]+"\n"
-                      "Telefono:"+f[3]+"\n"
-                      "Direccion:"+f[4]+"\n"
-                      "Fecha de Nacimiento:"+str(f[5])+"\n"
+        for alumno in query:
+                print("Numero de expediente:"+str(alumno.Num_Expediente)+"\n"
+                      "Nombre:"+alumno.Nombre+"\n"
+                      "Apellidos:"+alumno.Apellidos+"\n"
+                      "Telefono:"+alumno.Telefono+"\n"
+                      "Direccion:"+alumno.Direccion+"\n"
+                      "Fecha de Nacimiento:"+str(alumno.Fecha_Nacimiento)+"\n"
                       "--------------------------------\n")
     except:
         print("No se han podido mostrar todos los alumnos")
