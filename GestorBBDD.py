@@ -39,10 +39,10 @@ def crearBBDDSQL():
         print(f"Error de conexión a la base de datos con pymysql: {e}")
 
 
-def conectarPewee():
+def conectarPeeWee():
 
     """
-    Se conecta a la bbdd con Pewee mediante la configuracion obtenida en el fichero,
+    Se conecta a la bbdd con PeeWee mediante la configuracion obtenida en el fichero,
     establece conexion a la BBDD que se creo con MySQL y se conecta
 
     """
@@ -199,7 +199,4 @@ def crearTablas(db):
         db.create_tables([Alumno, Curso, Profesor, ProfesorCurso, AlumnoCurso])
     except OperationalError as e:
         print(f"Error al crear las tablas: {e}")
-
-    # FIXME estas tablas o sobran, o hay que convertirlas tambien
-    # crearTablaAlumnosCursos(db)
 

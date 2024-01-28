@@ -1,12 +1,12 @@
 from GestionAlumnos import menuAlumnos
 from GestionCursos import menuCursos
 from GestionProfesores import menuProfesores
-from GestorBBDD import crearBBDDSQL, crearTablas, conectarPewee
+from GestorBBDD import crearBBDDSQL, crearTablas, conectarPeeWee
 from Vinculaciones import menuVinculaciones
 from Utilidades import confirmacion
 
 crearBBDDSQL()
-db = conectarPewee()
+db = conectarPeeWee()
 crearTablas(db)
 
 finMenuPrincipal = False
