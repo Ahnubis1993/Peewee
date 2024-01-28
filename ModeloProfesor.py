@@ -4,10 +4,10 @@ from Utilidades import leerConfiguracion
 class Profesor(Model):
 
     Id = AutoField(primary_key=True)
-    Dni = CharField(max_length=9, unique=True)
-    Nombre = CharField(max_length=25)
-    Direccion = CharField(max_length=25)
-    Telefono = CharField(max_length=9)
+    Dni = CharField(unique=True)
+    Nombre = CharField()
+    Direccion = CharField()
+    Telefono = CharField()
 
     class Meta:
         config = leerConfiguracion()

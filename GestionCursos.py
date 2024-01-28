@@ -44,7 +44,7 @@ def insertarCurso():
         
         if(correcto):
             try:
-                Curso.create(Nombre=nombreCurso, Descripcion=descripcionCurso)
+                Curso.create(NombreCurso=nombreCurso, Descripcion=descripcionCurso)
                 print("Alta del Curso realizada correctamente")
                 
             except IntegrityError as e:
@@ -110,7 +110,7 @@ def modificarCurso():
                 if(nuevoNombreCurso != ""):
                     try:
                         if(confirmacion("Estas seguro de que deseas modificar el nobre del curso, (S/N): ")):
-                            Curso.update(Nombre=nuevoNombreCurso).where(Curso.Codigo == codigoCurso).execute()
+                            Curso.update(NombreCurso=nuevoNombreCurso).where(Curso.Codigo == codigoCurso).execute()
                             print("El nombre del curso se ha modificado correctamente")
                             modificado =True
                         else:
@@ -176,7 +176,7 @@ def busquedaCurso():
             nombreCurso = input("Introduce nombre del curso a buscar: ").strip()
             if(nombreCurso != ""):
                 try:
-                    cursos = Curso.select().where(Curso.Nombre == nombreCurso)
+                    cursos = Curso.select().where(Curso.NombreCurso == nombreCurso)
                 except DoesNotExist:
                     print("No hay Cursos con ese Nombre")
             else:
@@ -202,7 +202,7 @@ def busquedaCurso():
             print("--- Resultado de la busqueda ---")
             for curso in cursos:
                 print("Codigo:"+str(curso.Codigo)+"\n"
-                    "Nombre:"+curso.Nombre+"\n"
+                    "Nombre:"+curso.NombreCurso+"\n"
                     "Descripcion:"+curso.Descripcion+"\n"
                 "--------------------------------\n")
             
@@ -243,7 +243,7 @@ def mostrarTodosCursos():
         
         for curso in cursos:
             print("Codigo:"+str(curso.Codigo)+"\n"
-                    "Nombre:"+curso.Nombre+"\n"
+                    "Nombre:"+curso.NombreCurso+"\n"
                     "Descripcion:"+curso.Descripcion+"\n"
             "--------------------------------\n")
             

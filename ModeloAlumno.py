@@ -4,10 +4,10 @@ from Utilidades import leerConfiguracion
 class Alumno(Model):
     
     Num_Expediente = PrimaryKeyField()
-    Nombre = CharField(max_length=25, null=False)
-    Apellidos = CharField(max_length=25, null=False)
-    Telefono = CharField(max_length=9, null=False)
-    Direccion = CharField(max_length=25, null=False)
+    Nombre = CharField(null=False)
+    Apellidos = CharField(null=False)
+    Telefono = CharField(null=False)
+    Direccion = CharField(null=False)
     Fecha_Nacimiento = DateField(null=False)
     
     class Meta:

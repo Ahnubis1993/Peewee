@@ -18,7 +18,7 @@ def impartirCurso():
     y si no esta siendo impartido, se insertan ambos id de curso y profesor en la tabla intermedia
     """
     
-    print("-- Asignacion de Curso a Profesor ---")
+    print("\n-- Asignacion de Curso a Profesor ---")
     idProfesor = busquedaProfesor()
     codigoCurso = busquedaCurso()
     # Si encuentra las busquedas en la bbdd
@@ -39,7 +39,7 @@ def impartirCurso():
         except:
             print("No se ha producido ninguna accion")
     else:
-        print("Los resultados de busqueda no encuentran en la base de datos\n")
+        print("Los resultados de busqueda no se encuentran en la base de datos\n")
     
 def dejarImpartirCurso():
     
@@ -48,7 +48,7 @@ def dejarImpartirCurso():
     Luego se hace una consulta para ver si la vinculacion ya existe, y si es asi, se procede a la eliminacion
     """
     
-    print("-- Desasignacion de Curso a Profesor ---")
+    print("\n-- Desasignacion de Curso a Profesor ---")
     idProfesor = busquedaProfesor()
     codigoCurso = busquedaCurso()
     if(idProfesor != -1 and codigoCurso != -1):
@@ -58,15 +58,18 @@ def dejarImpartirCurso():
 
             if relacion:
                 # Si la relación existe, proceder con el borrado
-                relacion.delete_instance()
-                print("El profesor ha dejado de impartir el curso.")
+                if (confirmacion("Estas seguro de que deseas desasignar el curso? (S/N): ")):
+                    relacion.delete_instance()
+                    print("El profesor ha dejado de impartir el curso.")
+                else:
+                    print("El profesor seguira impartiendo el curso.")
             else:
                 print("El profesor no esta impartiendo ese curso.")
 
         except Exception as e:
             print(f"No se ha podido desvincular al profesor el curso: {e}")
     else:
-        print("Los resultados de busqueda no encuentran en la base de datos\n")
+        print("Los resultados de busqueda no se encuentran en la base de datos\n")
     
 def matricularAlumno():
     
@@ -76,7 +79,7 @@ def matricularAlumno():
     y si no es asi, se procede a su matriculacion
     """
     
-    print("-- Matriculacion Alumno ---")
+    print("\n-- Matriculacion Alumno ---")
     numExpediente = busquedaAlumno()
     codigoCurso = busquedaCurso()
     # Si encuentra las busquedas en la bbdd
@@ -97,7 +100,7 @@ def matricularAlumno():
         except:
             print("No se ha producido ninguna accion")
     else:
-        print("Los resultados de busqueda no encuentran en la base de datos\n")
+        print("Los resultados de busqueda no se encuentran en la base de datos\n")
     
 def desmatricularAlumno():
     
@@ -107,7 +110,7 @@ def desmatricularAlumno():
     y si es asi, se procede a la eliminacion
     """
 
-    print("-- Desmatriculacion Alumno ---")
+    print("\n-- Desmatriculacion Alumno ---")
     numExpediente = busquedaAlumno()
     codigoCurso = busquedaCurso()
     if(numExpediente != -1 and codigoCurso != -1):
@@ -117,18 +120,21 @@ def desmatricularAlumno():
 
             if resultado:
                 # Si la relación existe, proceder con el borrado
-                resultado.delete_instance()
-                print("Alumno desmatriculado correctamente.")
+                if (confirmacion("Estas seguro de que deseas desmatricular al alumno del curso? (S/N): ")):
+                    resultado.delete_instance()
+                    print("Alumno desmatriculado correctamente.")
+                else:
+                    print("Alumno no desmatriculado.")
             else:
                 print("El alumno no esta matriculado en ese curso.")
 
         except Exception as e:
             print(f"No se ha podido desmatricular al alumno del curso: {e}")
     else:
-        print("Los resultados de busqueda no encuentran en la base de datos\n")
+        print("Los resultados de busqueda no se encuentran en la base de datos\n")
         
 def mostrarRelacionesAlumnos():
-    print("--- Mostrar Matriculaciones Alumnos ---")
+    print("\n--- Mostrar Matriculaciones Alumnos ---")
     
     """
     Se realiza una consulta multitabla entre alumnos y cursos y mostrar los datos de la uniones
@@ -136,21 +142,28 @@ def mostrarRelacionesAlumnos():
     
     try:
 
-        relaciones = (Alumno
-                      .select(Alumno, Curso)
-                      .join(AlumnoCurso)
-                      .join(Curso)
-                      .distinct())
-        
-        if(relaciones):
-            for relacion in relaciones:
-                print("Num_Expediente:", relacion.Num_Expediente)
-                print("Nombre Alumno:", relacion.Nombre)
-                print("Apellidos Alumno:", relacion.Apellidos)
-                print("Teléfono Alumno:", relacion.Telefono)
-                print("Dirección Alumno:", relacion.Direccion)
-                print("Fecha de Nacimiento Alumno:", relacion.Fecha_Nacimiento)
-                print("Curso:", relacion.Nombre, "\n")
+        query = (Alumno
+                 .select(Alumno, Curso)
+                 .join(AlumnoCurso)  # Une con la tabla intermedia
+                 .join(Curso)  # Une con la tabla Curso
+                 )
+
+        if(query):
+            # Itera sobre los resultados de la consulta
+            for alumno_curso in query:
+                print("Datos de Alumno:")
+                print("Num_Expediente:", alumno_curso.Num_Expediente)
+                print("Nombre:", alumno_curso.Nombre)
+                print("Apellidos:", alumno_curso.Apellidos)
+                print("Teléfono:", alumno_curso.Telefono)
+                print("Dirección:", alumno_curso.Direccion)
+                print("Fecha de Nacimiento:", alumno_curso.Fecha_Nacimiento)
+
+                print("Datos de Curso:")
+                print("Codigo:", alumno_curso.curso.Codigo)
+                print("Nombre Curso:", alumno_curso.curso.NombreCurso)
+                print("Descripcion:", alumno_curso.curso.Descripcion)
+                print("\n")
         else:
             print("No hay alumnos matriculados en cursos")
                 
@@ -159,7 +172,7 @@ def mostrarRelacionesAlumnos():
         print(f"No se han podido mostrar los datos: {e}")
     
 def mostrarRelacionesProfesores():
-    print("--- Mostrar Asignaciones Profesor ---")
+    print("\n--- Mostrar Asignaciones Profesor ---")
 
     """
     Se realiza una consulta multitabla entre profesores y cursos y mostrar los datos de la uniones
@@ -181,7 +194,7 @@ def mostrarRelacionesProfesores():
                 print("Nombre:", relacion.Nombre)
                 print("Dirección:", relacion.Direccion)
                 print("Teléfono:", relacion.Telefono)
-                print("Curso:", relacion.Nombre)
+                print("Curso:", relacion.NombreCurso)
                 print()
         else:
             print("No hay profesores asignados a cursos")
