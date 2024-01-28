@@ -13,7 +13,7 @@ def leerConfiguracion():
     except FileNotFoundError:
         #Si el fichero no existe se crea y se le establecen valores por defecto
         file = open("ConfiguracionBBDD.txt", "w+")
-        file.write("db: jorgeGomez_gustavoPlaza_Pewee\n")
+        file.write("db: jorgeGomez_gustavoPlaza_PeeWee\n")
         file.write("usuario: root\n")
         file.write("contrasenia: alumno\n")
         file.write("host: localhost\n")
@@ -49,7 +49,7 @@ def leerConfiguracion():
 
     # Si alguno de los campos esta vacio se establece su valor por defecto
     if(baseDatos == ""):
-        baseDatos = "jorgeGomez_gustavoPlaza_Pewee"
+        baseDatos = "jorgeGomez_gustavoPlaza_PeeWee"
     if (usuario == ""):
         usuario = "root"
     if (contrasenia == ""):
