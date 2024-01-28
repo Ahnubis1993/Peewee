@@ -2,7 +2,7 @@ from pymysql import IntegrityError
 from Utilidades import confirmacion
 from ModeloCurso import Curso
 
-def insertarCurso(conexionBBDD):
+def insertarCurso():
     
     """
     Descripción corta de la función.
@@ -10,7 +10,6 @@ def insertarCurso(conexionBBDD):
     Da de alta un curso, si alguno de los atributos a asignar falla 5 veces, no se crea el curso 
     y se pide si quieres dar de alta otro
 
-    :param parametro1: conexion a bbdd
     """
     fin = False
     while(not fin):
@@ -44,27 +43,20 @@ def insertarCurso(conexionBBDD):
         
         if(correcto):
             try:
-                cursor = conexionBBDD.cursor()
-                cursor.execute("INSERT INTO Cursos (nombre, descripcion) VALUES (%s, %s)",
-                            (nombreCurso, descripcionCurso))
-                conexionBBDD.commit()
-                print("Alta realizada correctamente")
+                Curso.create(Nombre=nombreCurso, Descripcion=descripcionCurso)
+                print("Alta del Curso realizada correctamente")
                 
             except IntegrityError as e:
-                #Captura error de integridad de la base de datos
                 if ("Duplicate entry" in str(e)):
-                    print("Ya existe un curso con ese nombre")
+                    print("Ya existe un curso con ese Nombre")
                 else:
-                    print("Error al introducir el curso en la base de datos")
+                    print("Error al introducir el Curso en la base de datos")
             except:
-                print("Curso no dado de alta, fallo al introducir el curso en la base de datos")
-            finally:
-                if (cursor is not None):
-                    cursor.close()
+                print("Curso no dado de alta, fallo al introducir el Curso en la base de datos")
         else:
             print("Has introducido el dato mal 5 veces. Alta cancelada.")
             
-        if(not confirmacion("Deseas introducir un curso? (S/N): ")):
+        if(not confirmacion("Deseas introducir otro Curso? (S/N): ")):
             fin = True
             print("Fin alta Curso")
     

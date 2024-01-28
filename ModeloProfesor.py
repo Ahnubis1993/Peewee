@@ -18,5 +18,3 @@ class Profesor(Model):
             host=config["host"],
             port=config["port"]
         )
-        # La restricción en Dni como campo unico
-        constraints = [SQL('UNIQUE (Dni)')]
