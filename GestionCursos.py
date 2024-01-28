@@ -1,3 +1,4 @@
+from peewee import DoesNotExist
 from pymysql import IntegrityError
 from Utilidades import confirmacion
 from ModeloCurso import Curso
@@ -61,46 +62,37 @@ def insertarCurso():
             print("Fin alta Curso")
     
 
-def eliminarCursor(conexionBBDD):
+def eliminarCursor():
     
     """
     Elimina un curso mediante el id que es buscado por el metodo busquedaCurso
     Se obtiene el id del mismo y se elimina de las correspondientes tablas en la que se encuentre
-
-    :param parametro1: conexion a bbdd
     """
     
     print("--- Baja Curso ---")
-    codigoCurso = busquedaCurso(conexionBBDD)
+    codigoCurso = busquedaCurso()
     if(codigoCurso != -1):
         if(confirmacion("Estas seguro de que deseas eliminar el curso con codigo '"+str(codigoCurso)+"'? (S/N): ")):
             try:
-                cursor = conexionBBDD.cursor()
-                cursor.execute("DELETE FROM Cursos WHERE Codigo=%s",codigoCurso)
-                conexionBBDD.commit()
+                Curso.delete().where(Curso.Codigo == codigoCurso).execute()
                 print("Curso con codigo '"+str(codigoCurso)+"' eliminado correctamente")
             except:
                 print("Error al eliminar el curso de la base de datos")
-            finally: 
-                if (cursor is not None):
-                    cursor.close()
         else:
             print("Curso con codigo '"+str(codigoCurso)+"' no ha sido dado de baja")
     else:
         print("No hay resultados de busqueda. Fin baja Curso")
     
-def modificarCurso(conexionBBDD):
+def modificarCurso():
     
     """
     Modifica un curso que es buscado, mediante el id
     del curso, seleccionamos el atributo que se desee modificar siempre y cuando se acepte la confirmacion
-
-    :param parametro1: conexion a bbdd
     """
     
     print("--- Modificacion Curso ---")
     
-    codigoCurso = busquedaCurso(conexionBBDD)  
+    codigoCurso = busquedaCurso()
     finModificacionCurso = False
     modificado = False
     
@@ -118,18 +110,13 @@ def modificarCurso(conexionBBDD):
                 if(nuevoNombreCurso != ""):
                     try:
                         if(confirmacion("Estas seguro de que deseas modificar el nobre del curso, (S/N): ")):
-                            cursor = conexionBBDD.cursor()
-                            cursor.execute("UPDATE Cursos SET Nombre=%s WHERE Codigo=%s", (nuevoNombreCurso, codigoCurso))
-                            conexionBBDD.commit()
+                            Curso.update(Nombre=nuevoNombreCurso).where(Curso.Codigo == codigoCurso).execute()
                             print("El nombre del curso se ha modificado correctamente")
                             modificado =True
                         else:
                             print("Has cancelado la modificacion")
                     except:
                         print("Consulta por nombre no valida")
-                    finally: 
-                        if (cursor is not None):
-                            cursor.close()
                 else:
                     print("El nombre del curso no puede estar vacio")
             elif(opcion=="2"):
@@ -137,18 +124,13 @@ def modificarCurso(conexionBBDD):
                 if(descripcionCurso != ""):
                     try:
                         if(confirmacion("Estas seguro de que deseas modificar la descripcion del curso, (S/N): ")):
-                            cursor = conexionBBDD.cursor()
-                            cursor.execute("UPDATE Cursos SET Descripcion=%s WHERE Codigo=%s", (descripcionCurso, codigoCurso))
-                            conexionBBDD.commit()
+                            Curso.update(Descripcion=descripcionCurso).where(Curso.Codigo == codigoCurso).execute()
                             print("La descripcion del curso se ha modificado correctamente")
                             modificado =True
                         else:
                             print("Has cancelado la modificacion")    
                     except:
                         print("Consulta por descripcion no valida")
-                    finally: 
-                        if (cursor is not None):
-                            cursor.close()
                 else:
                     print("La descripcion el curso no puede estar vacia")
                 
@@ -168,18 +150,17 @@ def modificarCurso(conexionBBDD):
     else:
         print("No hay resultados de busqueda. Fin modificacion Curso")   
         
-def busquedaCurso(conexionBBDD):
+def busquedaCurso():
     
     """
     Busca un curso mediante cualquier atributo del mismo, si es localizado se devuelve el id 
     pera poder gestionarlo en otros metodos
 
-    :param parametro1: conexion a bbdd
     """
     
     codigoCurso = -1
     finBusquedaCurso = False
-    filasTablaCurso = []
+    cursos = None
     
     while(not finBusquedaCurso):
         
@@ -191,32 +172,23 @@ def busquedaCurso(conexionBBDD):
         opcion = input("Introduce una opcion: ").strip()
         
         if(opcion=="1"):
+
             nombreCurso = input("Introduce nombre del curso a buscar: ").strip()
             if(nombreCurso != ""):
                 try:
-                    cursor = conexionBBDD.cursor()
-                    cursor.execute("SELECT * FROM Cursos WHERE Nombre=%s", (nombreCurso))
-                    filasTablaCurso = cursor.fetchall()
-                except:
-                    print("Consulta por nombre no valida")
-                finally: 
-                    if (cursor is not None):
-                        cursor.close()
-
+                    cursos = Curso.select().where(Curso.Nombre == nombreCurso)
+                except DoesNotExist:
+                    print("No hay Cursos con ese Nombre")
             else:
                 print("El nombre del curso no puede estar vacio")
+
         elif(opcion=="2"):
             descripcionCurso = input("Introduce descripcion del curso a buscar: ").strip()
             if(descripcionCurso != ""):
                 try:
-                    cursor = conexionBBDD.cursor()
-                    cursor.execute("SELECT * FROM Cursos WHERE Descripcion=%s", (descripcionCurso))
-                    filasTablaCurso = cursor.fetchall()
-                except:
-                    print("Consulta por descripcion no valida")
-                finally: 
-                    if (cursor is not None):
-                        cursor.close()
+                    cursos = Curso.select().where(Curso.Descripcion == descripcionCurso)
+                except DoesNotExist:
+                    print("No hay Cursos con esa descripcion")
             else:
                 print("La descripcion el curso no puede estar vacia")
             
@@ -226,27 +198,27 @@ def busquedaCurso(conexionBBDD):
         else:
             print("Opcion no valida")
             
-        if(not finBusquedaCurso and filasTablaCurso):
+        if(not finBusquedaCurso and cursos):
             print("--- Resultado de la busqueda ---")
-            for f in filasTablaCurso:
-                print("Codigo:"+str(f[0])+"\n"
-                    "Nombre:"+f[1]+"\n"
-                    "Descripcion:"+f[2]+"\n"
+            for curso in cursos:
+                print("Codigo:"+str(curso.Codigo)+"\n"
+                    "Nombre:"+curso.Nombre+"\n"
+                    "Descripcion:"+curso.Descripcion+"\n"
                 "--------------------------------\n")
             
-            if(len(filasTablaCurso)>1):
+            if(len(cursos)>1):
                 finBusquedaIdCurso = False
                 while(not finBusquedaIdCurso):
                     codigoCurso = input("Introduce el id del curso a elegir")
                     if(codigoCurso.isdigit()):
-                        codigoCursoEncontrado = [fila for fila in filasTablaCurso if(f[0]==int(codigoCurso))]
+                        codigoCursoEncontrado = [curso for curso in cursos if(curso.Codigo==int(codigoCurso))]
                         if(codigoCursoEncontrado):
                             codigoCurso = codigoCursoEncontrado[0]
                             finBusquedaIdCurso = True
                     else:
                         print("Tienes que insertar un numero")
-            elif(len(filasTablaCurso)==1):
-                codigoCurso = filasTablaCurso[0][0]
+            elif(len(cursos)==1):
+                codigoCurso = cursos[0].Codigo
                 finBusquedaCurso = True
         else:
             if(not confirmacion("No se han encontrado resultados. Deseas buscar de nuevo? (S/N): ")):
@@ -254,43 +226,36 @@ def busquedaCurso(conexionBBDD):
         
     return codigoCurso
 
-def mostrarTodosCursos(conexionBBDD):
+def mostrarTodosCursos():
     
     """
     Muestra todos los cursos que haya en la tabla Cursos
 
-    :param parametro1: conexion a bbdd
     """
     
     print("--- Mostrar Todos los Cursos ---")
     
     try:
-        cursor=conexionBBDD.cursor()
-        cursor.execute("SELECT * FROM Cursos")
-        filas = cursor.fetchall()
+        cursos = Curso.select()
         
-        if(len(filas)==0):
+        if(len(cursos)==0):
             print("No hay cursos registrados")
         
-        for f in filas:
-            print("Codigo:"+str(f[0])+"\n"
-                    "Nombre:"+f[1]+"\n"
-                    "Descripcion:"+f[2]+"\n"
+        for curso in cursos:
+            print("Codigo:"+str(curso.Codigo)+"\n"
+                    "Nombre:"+curso.Nombre+"\n"
+                    "Descripcion:"+curso.Descripcion+"\n"
             "--------------------------------\n")
             
     except:
         print("No se han podido mostrar todos los cursos")
-    finally: 
-        if (cursor is not None):
-            cursor.close()
     
-def menuCursos(conexionBBDD):
+def menuCursos():
     
     """
     Menu de cursos donde se pueden elegir las diferentes operaciones de gestion relacionados con el mismo
     Se pedira una opcion para entrar en alguno de los submenus, si insertas 0, sale al menuPrincipal
 
-    :param parametro1: conexion a bbdd
     """
     
     finMenuCurso = False
@@ -307,15 +272,15 @@ def menuCursos(conexionBBDD):
         opcion = input("Introduce una Opcion: ").strip()
         
         if(opcion=="1"):
-            insertarCurso(conexionBBDD)
+            insertarCurso()
         elif(opcion=="2"):
-            eliminarCursor(conexionBBDD)
+            eliminarCursor()
         elif(opcion=="3"):
-            modificarCurso(conexionBBDD)
+            modificarCurso()
         elif(opcion=="4"):
-            busquedaCurso(conexionBBDD)
+            busquedaCurso()
         elif(opcion=="5"):
-            mostrarTodosCursos(conexionBBDD)
+            mostrarTodosCursos()
         elif(opcion=="0"):
             finMenuCurso = True
             print("Regresando a Menu Principal")

@@ -1,194 +1,156 @@
 from GestionProfesores import busquedaProfesor
 from GestionAlumnos import busquedaAlumno
 from GestionCursos import busquedaCurso
+from ModeloAlumno import Alumno
+from ModeloCurso import Curso
+from ModeloProfesor import Profesor
 from Utilidades import confirmacion
 from pymysql import IntegrityError
+from ModeloProfesorCurso import ProfesorCurso
+from ModeloAlumnoCurso import AlumnoCurso
 
 
-def impartirCurso(conexionBBDD):
+def impartirCurso():
     
     """
     Se realizan las busquedas de los id de curso y profesor para realizar la inserccion
     Luego se hace una consulta para ver si el curso ya existe en la tabla, es decir, si esta siendo impartido,
     y si no esta siendo impartido, se insertan ambos id de curso y profesor en la tabla intermedia
-
-    :param parametro1: conexion a bbdd
     """
     
     print("-- Asignacion de Curso a Profesor ---")
-    idProfesor = busquedaProfesor(conexionBBDD)
-    codigoCurso = busquedaCurso(conexionBBDD)
+    idProfesor = busquedaProfesor()
+    codigoCurso = busquedaCurso()
     # Si encuentra las busquedas en la bbdd
     if(idProfesor != -1 and codigoCurso != -1):
         try:
-            # Ejecuto consulta para ver si el curso ya esta asignado, para ello tiene que haber alguna id del curso
-            cursor = conexionBBDD.cursor()
-            cursor.execute("SELECT * FROM Profesores_Cursos WHERE Id_Curso = %s", (codigoCurso))
-            resultado = cursor.fetchone()
-            
+            # Ejecuto consulta para ver si el curso ya esta asignado, para ello tiene que haber algun id del curso
+            resultado = ProfesorCurso.get_or_none(Id_Curso=codigoCurso, Id_Profesor=idProfesor)
             # Si ya existe, un profesor lo esta impartiendo
             if(resultado):
                 print("El curso ya tiene asignado a un profesor\n")
             # Si no, lo asignamos
             else:
-                cursor.execute("INSERT INTO Profesores_Cursos (Id_Profesor, Id_Curso) VALUES (%s, %s)", (idProfesor, codigoCurso))
-                conexionBBDD.commit()
+                ProfesorCurso.create(Id_Profesor=idProfesor, Id_Curso=codigoCurso)
                 print("El profesor ahora impartira el curso\n")
                 
         except IntegrityError:
             print("La asignacion no se ha podido efectuar")
         except:
             print("No se ha producido ninguna accion")
-        finally:
-            if(cursor is not None):
-                cursor.close()
     else:
         print("Los resultados de busqueda no encuentran en la base de datos\n")
     
-def dejarImpartirCurso(conexionBBDD):
+def dejarImpartirCurso():
     
     """
     Se realizan las busquedas de los id de curso y profesor para realizar el borrado
     Luego se hace una consulta para ver si la vinculacion ya existe, y si es asi, se procede a la eliminacion
-
-    :param parametro1: conexion a bbdd
     """
     
     print("-- Desasignacion de Curso a Profesor ---")
-    idProfesor = busquedaProfesor(conexionBBDD)
-    codigoCurso = busquedaCurso(conexionBBDD)
+    idProfesor = busquedaProfesor()
+    codigoCurso = busquedaCurso()
     if(idProfesor != -1 and codigoCurso != -1):
         try:
-        # Crear un cursor
-            cursor = conexionBBDD.cursor()
-
             # Consultar si la relación existe antes de intentar borrarla, si hay un curso en la tabla, ya tiene un profesor asignado
-            cursor.execute("SELECT * FROM Profesores_Cursos WHERE Id_Curso = %s AND Id_Profesor = %s;", (codigoCurso, idProfesor))
-            resultado = cursor.fetchone()
+            relacion = ProfesorCurso.get_or_none(Id_Profesor=idProfesor, Id_Curso=codigoCurso)
 
-            if resultado:
+            if relacion:
                 # Si la relación existe, proceder con el borrado
-                cursor.execute("DELETE FROM Profesores_Cursos WHERE Id_Curso = %s AND Id_Profesor = %s;", (codigoCurso, idProfesor))
-                conexionBBDD.commit()
+                relacion.delete_instance()
                 print("El profesor ha dejado de impartir el curso.")
             else:
                 print("El profesor no esta impartiendo ese curso.")
 
         except Exception as e:
             print(f"No se ha podido desvincular al profesor el curso: {e}")
-        finally:
-            if(cursor is not None):
-                cursor.close()
     else:
         print("Los resultados de busqueda no encuentran en la base de datos\n")
     
-def matricularAlumno(conexionBBDD):
+def matricularAlumno():
     
     """
     Se realizan las busquedas de los id de curso y alumno para realizar la inserccion
     Luego se hace una consulta para ver si el curso ya esta matriculado con ese alumno
     y si no es asi, se procede a su matriculacion
-
-    :param parametro1: conexion a bbdd
     """
     
     print("-- Matriculacion Alumno ---")
-    numExpediente = busquedaAlumno(conexionBBDD)
-    codigoCurso = busquedaCurso(conexionBBDD)
+    numExpediente = busquedaAlumno()
+    codigoCurso = busquedaCurso()
     # Si encuentra las busquedas en la bbdd
     if(numExpediente != -1 and codigoCurso != -1):
         try:
             # Ejecuto consulta para ver si ese curso esta asignado ya al alumno
-            cursor = conexionBBDD.cursor()
-            cursor.execute("SELECT * FROM Alumnos_Cursos WHERE Id_Curso = %s AND Num_Expediente=%s", (codigoCurso, numExpediente))
-            resultado = cursor.fetchone()
-            
+            resultado = AlumnoCurso.get_or_none(Id_Curso=codigoCurso, Id_Alumno=numExpediente)
             # Si ya existe la vinculacion
             if(resultado):
                 print("El alumno ya esta matriculado en el curso\n")
             # Si no, lo asignamos
             else:
-                cursor.execute("INSERT INTO Alumnos_Cursos (Num_Expediente, Id_Curso) VALUES (%s, %s)", (numExpediente, codigoCurso))
-                conexionBBDD.commit()
+                AlumnoCurso.create(Id_Alumno=numExpediente, Id_Curso=codigoCurso)
                 print("El Alumno ahora esta matriculado en el curso\n")
                 
         except IntegrityError:
             print("La asignacion no se ha podido efectuar")
         except:
             print("No se ha producido ninguna accion")
-        finally:
-            if(cursor is not None):
-                cursor.close()
     else:
         print("Los resultados de busqueda no encuentran en la base de datos\n")
     
-def desmatricularAlumno(conexionBBDD):
+def desmatricularAlumno():
     
     """
     Se realizan las busquedas de los id de curso y alumno para realizar el borrado
     Luego se hace una consulta para ver si el curso esta vinculado al alumno,
     y si es asi, se procede a la eliminacion
-
-    :param parametro1: conexion a bbdd
     """
 
     print("-- Desmatriculacion Alumno ---")
-    numExpediente = busquedaAlumno(conexionBBDD)
-    codigoCurso = busquedaCurso(conexionBBDD)
+    numExpediente = busquedaAlumno()
+    codigoCurso = busquedaCurso()
     if(numExpediente != -1 and codigoCurso != -1):
         try:
-        # Crear un cursor
-            cursor = conexionBBDD.cursor()
-
             # Consulta que verifica que existe la relacion en la tabla Alumnos_Cursos
-            cursor.execute("SELECT * FROM Alumnos_Cursos WHERE Id_Curso = %s AND Num_Expediente = %s;", (codigoCurso, numExpediente))
-            resultado = cursor.fetchone()
+            resultado = AlumnoCurso.get_or_none(Id_Alumno=numExpediente, Id_Curso=codigoCurso)
 
             if resultado:
                 # Si la relación existe, proceder con el borrado
-                cursor.execute("DELETE FROM Alumnos_Cursos WHERE Id_Curso = %s AND Num_Expediente = %s;", (codigoCurso, numExpediente))
-                conexionBBDD.commit()
+                resultado.delete_instance()
                 print("Alumno desmatriculado correctamente.")
             else:
                 print("El alumno no esta matriculado en ese curso.")
 
         except Exception as e:
             print(f"No se ha podido desmatricular al alumno del curso: {e}")
-        finally:
-            if(cursor is not None):
-                cursor.close()
     else:
         print("Los resultados de busqueda no encuentran en la base de datos\n")
         
-def mostrarRelacionesAlumnos(conexionBBDD):
+def mostrarRelacionesAlumnos():
     print("--- Mostrar Matriculaciones Alumnos ---")
     
     """
     Se realiza una consulta multitabla entre alumnos y cursos y mostrar los datos de la uniones
-
-    :param parametro1: conexion a bbdd
     """
     
     try:
-        cursor = conexionBBDD.cursor()
-        # Group_Concat, concatena todos los cursos de ese alumno
-        cursor.execute("SELECT Alumnos.Num_Expediente, Alumnos.Nombre, Alumnos.Apellidos, Alumnos.Telefono, "
-                       "Alumnos.Direccion, Alumnos.Fecha_Nacimiento, GROUP_CONCAT(Cursos.Nombre) AS Cursos "
-                       "FROM Alumnos_Cursos, Cursos, Alumnos "
-                       "WHERE Alumnos.Num_Expediente = Alumnos_Cursos.Num_Expediente "
-                       "AND Cursos.Codigo = Alumnos_Cursos.Id_Curso "
-                       "GROUP BY Alumnos.Num_Expediente")
-        filas = cursor.fetchall()
+
+        relaciones = (Alumno
+                      .select(Alumno, Curso)
+                      .join(AlumnoCurso)
+                      .join(Curso)
+                      .distinct())
         
-        if(filas):
-            for f in filas:
-                print("Alumno:", f[0])
-                print("Nombre:", f[1])
-                print("Apellidos:", f[2])
-                print("Teléfono:", f[3])
-                print("Dirección:", f[4])
-                print("Fecha de Nacimiento:", f[5])
-                print("Cursos:", f[6],"\n")
+        if(relaciones):
+            for relacion in relaciones:
+                print("Num_Expediente:", relacion.Num_Expediente)
+                print("Nombre Alumno:", relacion.Nombre)
+                print("Apellidos Alumno:", relacion.Apellidos)
+                print("Teléfono Alumno:", relacion.Telefono)
+                print("Dirección Alumno:", relacion.Direccion)
+                print("Fecha de Nacimiento Alumno:", relacion.Fecha_Nacimiento)
+                print("Curso:", relacion.Nombre, "\n")
         else:
             print("No hay alumnos matriculados en cursos")
                 
@@ -196,46 +158,43 @@ def mostrarRelacionesAlumnos(conexionBBDD):
     except Exception as e:
         print(f"No se han podido mostrar los datos: {e}")
     
-def mostrarRelacionesProfesores(conexionBBDD):
+def mostrarRelacionesProfesores():
     print("--- Mostrar Asignaciones Profesor ---")
 
     """
     Se realiza una consulta multitabla entre profesores y cursos y mostrar los datos de la uniones
-
-    :param parametro1: conexion a bbdd
     """
     
     try:
-        cursor = conexionBBDD.cursor()
-        cursor.execute("SELECT Profesores.Id, Profesores.Dni, Profesores.Nombre, Profesores.Direccion, Profesores.Telefono, "
-                       "Cursos.Nombre AS Curso "
-                       "FROM Profesores_Cursos, Cursos, Profesores "
-                       "WHERE Profesores.Id = Profesores_Cursos.Id_Profesor "
-                       "AND Cursos.Codigo = Profesores_Cursos.Id_Curso")
-        filas = cursor.fetchall()
-        
-        if(filas):
-            for f in filas:
-                print("Profesor:", f[0])
-                print("Dni:", f[1])
-                print("Nombre:", f[2])
-                print("Direccion:", f[3])
-                print("Telefono:", f[4])
-                print("Curso:", f[5],"\n")
+        relaciones = (Profesor
+                             .select(Profesor, Curso)
+                             .join(ProfesorCurso)
+                             .join(Curso)
+                             .distinct())
+
+        if (relaciones):
+            # Iterar sobre los resultados e imprimir la información de cada profesor y el nombre del curso
+            for relacion in relaciones:
+                print("Profesor:")
+                print("ID:", relacion.Id)
+                print("DNI:", relacion.Dni)
+                print("Nombre:", relacion.Nombre)
+                print("Dirección:", relacion.Direccion)
+                print("Teléfono:", relacion.Telefono)
+                print("Curso:", relacion.Nombre)
+                print()
         else:
-            print("No ha profesores asignados a cursos")        
+            print("No hay profesores asignados a cursos")
         
         
     except Exception as e:
         print(f"No se han podido mostrar los datos: {e}")
 
-def menuVinculaciones(conexionBBDD):
+def menuVinculaciones():
     
 
     """
     Menu vinculaciones para elegir una de las gestion mediante la insercion de un numero
-
-    :param parametro1: conexion a bbdd
     """
     
     finMenuVinculaciones = False
@@ -253,17 +212,17 @@ def menuVinculaciones(conexionBBDD):
         opcion = input("Introduce opcion: ").strip()
 
         if(opcion=="1"):
-            impartirCurso(conexionBBDD)
+            impartirCurso()
         elif(opcion=="2"):
-            dejarImpartirCurso(conexionBBDD)
+            dejarImpartirCurso()
         elif(opcion=="3"):
-            matricularAlumno(conexionBBDD)
+            matricularAlumno()
         elif(opcion=="4"):
-            desmatricularAlumno(conexionBBDD)
+            desmatricularAlumno()
         elif(opcion=="5"):
-            mostrarRelacionesAlumnos(conexionBBDD)
+            mostrarRelacionesAlumnos()
         elif(opcion=="6"):
-            mostrarRelacionesProfesores(conexionBBDD)
+            mostrarRelacionesProfesores()
         elif(opcion=="0"):
             finMenuVinculaciones = True
             print("Regresando a Menu Principal. Fin Menu Vinculaciones")

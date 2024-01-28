@@ -29,7 +29,7 @@ while(not finMenuPrincipal):
 
     # Para capturar el error de interrupcion si salgo del programa sin ejecutar nada (problemas del IDE)
     try:
-        opcion = input("Introduce una Opcion: ")
+        opcion = input("Introduce una Opcion: ").strip()
     except KeyboardInterrupt:
         opcion = "0"
 
@@ -38,9 +38,9 @@ while(not finMenuPrincipal):
     elif(opcion=="2"):
         menuProfesores()
     elif(opcion=="3"):
-        menuCursos(db)
+        menuCursos()
     elif(opcion=="4"):
-        menuVinculaciones(db)
+        menuVinculaciones()
     elif(opcion=="0"):
         if(confirmacion("Estas seguro que deseas salir del programa? (S/N): ")):
             finMenuPrincipal=True
