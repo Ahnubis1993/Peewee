@@ -13,7 +13,7 @@ def insertarCurso():
     """
     fin = False
     while(not fin):
-        print("--- Alta Curso ---")
+        print("\n--- Alta Curso ---")
         
         correcto = False
         intentos = 5
@@ -48,9 +48,9 @@ def insertarCurso():
                 
             except IntegrityError as e:
                 if ("Duplicate entry" in str(e)):
-                    print("Ya existe un curso con ese Nombre")
+                    print("Ya existe un curso con ese nombre")
                 else:
-                    print("Error al introducir el Curso en la base de datos")
+                    print("Error al introducir el curso en la base de datos")
             except:
                 print("Curso no dado de alta, fallo al introducir el Curso en la base de datos")
         else:
@@ -68,19 +68,26 @@ def eliminarCursor():
     Se obtiene el id del mismo y se elimina de las correspondientes tablas en la que se encuentre
     """
     
-    print("--- Baja Curso ---")
-    codigoCurso = busquedaCurso(True)
-    if(codigoCurso != -1):
-        if(confirmacion("Estas seguro de que deseas eliminar el curso con codigo '"+str(codigoCurso)+"'? (S/N): ")):
-            try:
-                Curso.delete().where(Curso.Codigo == codigoCurso).execute()
-                print("Curso con codigo '"+str(codigoCurso)+"' eliminado correctamente")
-            except:
-                print("Error al eliminar el curso de la base de datos")
+    print("\n--- Baja Curso ---")
+
+    cursos = Curso.select()
+
+    if(cursos):
+
+        codigoCurso = busquedaCurso(True)
+        if(codigoCurso != -1):
+            if(confirmacion("Estas seguro de que deseas eliminar el curso con codigo '"+str(codigoCurso)+"'? (S/N): ")):
+                try:
+                    Curso.delete().where(Curso.Codigo == codigoCurso).execute()
+                    print("Curso con codigo '"+str(codigoCurso)+"' eliminado correctamente")
+                except:
+                    print("Error al eliminar el curso de la base de datos")
+            else:
+                print("Curso con codigo '"+str(codigoCurso)+"' no ha sido dado de baja")
         else:
-            print("Curso con codigo '"+str(codigoCurso)+"' no ha sido dado de baja")
+            print("No hay resultados de busqueda. Fin baja Curso")
     else:
-        print("No hay resultados de busqueda. Fin baja Curso")
+        print("No hay cursos en la BBDD")
     
 def modificarCurso():
     
@@ -89,65 +96,71 @@ def modificarCurso():
     del curso, seleccionamos el atributo que se desee modificar siempre y cuando se acepte la confirmacion
     """
     
-    print("--- Modificacion Curso ---")
-    
-    codigoCurso = busquedaCurso(True)
-    finModificacionCurso = False
-    modificado = False
-    
-    if(codigoCurso != -1):
-        while(not finModificacionCurso):  
-            print("Elige un atributo de los siguientes: ")
-            print("--- Atributos ---")
-            print("1 - Nombre")
-            print("2 - Descripcion")
-            print("0 - Salir")
-            opcion = input("Introduce una opcion: ").strip()
-            
-            if(opcion=="1"):
-                nuevoNombreCurso = input("Introduce nuevo nombre a modificar: ").strip()
-                if(nuevoNombreCurso != ""):
-                    try:
-                        if(confirmacion("Estas seguro de que deseas modificar el nobre del curso, (S/N): ")):
-                            Curso.update(NombreCurso=nuevoNombreCurso).where(Curso.Codigo == codigoCurso).execute()
-                            print("El nombre del curso se ha modificado correctamente")
-                            modificado =True
-                        else:
-                            print("Has cancelado la modificacion")
-                    except:
-                        print("Consulta por nombre no valida")
-                else:
-                    print("El nombre del curso no puede estar vacio")
-            elif(opcion=="2"):
-                descripcionCurso = input("Introduce nueva descripcion del curso a modificar: ").strip()
-                if(descripcionCurso != ""):
-                    try:
-                        if(confirmacion("Estas seguro de que deseas modificar la descripcion del curso, (S/N): ")):
-                            Curso.update(Descripcion=descripcionCurso).where(Curso.Codigo == codigoCurso).execute()
-                            print("La descripcion del curso se ha modificado correctamente")
-                            modificado =True
-                        else:
-                            print("Has cancelado la modificacion")    
-                    except:
-                        print("Consulta por descripcion no valida")
-                else:
-                    print("La descripcion el curso no puede estar vacia")
-                
-            elif(opcion=="0"):
-                finModificacionCurso = True
-                print("Fin Modificacioi Curso")
-            else:
-                print("Opcion no valida")
-                
-            if(modificado):
-                if(not confirmacion("Deseas modificar algo mas de este curso? (S/N): ")):
+    print("\n--- Modificacion Curso ---")
+
+    cursos = Curso.select()
+
+    if (cursos):
+
+        codigoCurso = busquedaCurso(True)
+        finModificacionCurso = False
+        modificado = False
+
+        if(codigoCurso != -1):
+            while(not finModificacionCurso):
+                print("Elige un atributo de los siguientes: ")
+                print("--- Atributos ---")
+                print("1 - Nombre")
+                print("2 - Descripcion")
+                print("0 - Salir")
+                opcion = input("Introduce una opcion: ").strip()
+
+                if(opcion=="1"):
+                    nuevoNombreCurso = input("Introduce nuevo nombre a modificar: ").strip()
+                    if(nuevoNombreCurso != ""):
+                        try:
+                            if(confirmacion("Estas seguro de que deseas modificar el nobre del curso, (S/N): ")):
+                                Curso.update(NombreCurso=nuevoNombreCurso).where(Curso.Codigo == codigoCurso).execute()
+                                print("El nombre del curso se ha modificado correctamente")
+                                modificado =True
+                            else:
+                                print("Has cancelado la modificacion")
+                        except:
+                            print("Consulta por nombre no valida")
+                    else:
+                        print("El nombre del curso no puede estar vacio")
+                elif(opcion=="2"):
+                    descripcionCurso = input("Introduce nueva descripcion del curso a modificar: ").strip()
+                    if(descripcionCurso != ""):
+                        try:
+                            if(confirmacion("Estas seguro de que deseas modificar la descripcion del curso, (S/N): ")):
+                                Curso.update(Descripcion=descripcionCurso).where(Curso.Codigo == codigoCurso).execute()
+                                print("La descripcion del curso se ha modificado correctamente")
+                                modificado =True
+                            else:
+                                print("Has cancelado la modificacion")
+                        except:
+                            print("Consulta por descripcion no valida")
+                    else:
+                        print("La descripcion el curso no puede estar vacia")
+
+                elif(opcion=="0"):
                     finModificacionCurso = True
-            else:
-                if(not confirmacion("No has modificado ningun atributo de curso. Deseas modificar alguno? (S/N): ")):
-                    finModificacionCurso = True
-                    
+                    print("Fin Modificacioi Curso")
+                else:
+                    print("Opcion no valida")
+
+                if(modificado):
+                    if(not confirmacion("Deseas modificar algo mas de este curso? (S/N): ")):
+                        finModificacionCurso = True
+                else:
+                    if(not confirmacion("No has modificado ningun atributo de curso. Deseas modificar alguno? (S/N): ")):
+                        finModificacionCurso = True
+
+        else:
+            print("No hay resultados de busqueda. Fin modificacion Curso")
     else:
-        print("No hay resultados de busqueda. Fin modificacion Curso")   
+        print("No hay cursos en la BBDD")
         
 def busquedaCurso(cursoUnico = False):
     
@@ -157,83 +170,89 @@ def busquedaCurso(cursoUnico = False):
 
     """
     
-    print("--- Busqueda Curso ---")
-    
-    codigoCurso = -1
-    finBusqueda = False
-    query = None
-    
-    while(not finBusqueda):
-        
-        print("Elige un atributo de los siguientes: ")
-        print("--- Atributos ---")
-        print("1 - Nombre")
-        print("2 - Descripcion")
-        print("0 - Salir")
-        opcion = input("Introduce una opcion: ").strip()
-        
-        if(opcion=="1"):
+    print("\n--- Busqueda Curso ---")
 
-            nombreCurso = input("Introduce nombre del curso a buscar: ").strip()
-            if(nombreCurso != ""):
-                try:
-                    query = Curso.select().where(Curso.NombreCurso == nombreCurso)
-                except DoesNotExist:
-                    print("No hay Cursos con ese Nombre")
-            else:
-                print("El nombre del curso no puede estar vacio")
+    cursos = Curso.select()
 
-        elif(opcion=="2"):
-            descripcionCurso = input("Introduce descripcion del curso a buscar: ").strip()
-            if(descripcionCurso != ""):
-                try:
-                    query = Curso.select().where(Curso.Descripcion == descripcionCurso)
-                except DoesNotExist:
-                    print("No hay Cursos con esa descripcion")
-            else:
-                print("La descripcion el curso no puede estar vacia")
-            
-        elif(opcion=="0"):
-            finBusqueda = True
-            print("Fin busqueda Curso")
-        else:
-            print("Opcion no valida")
-            
-        if(not finBusqueda):
-            if (query is not None):
-                cantidadResultados = query.count()
-                
-            print("--- Resultado de la Busqueda ---")
-            for curso in query:
-                print("Codigo:"+str(curso.Codigo)+"\n"
-                    "Nombre:"+curso.NombreCurso+"\n"
-                    "Descripcion:"+curso.Descripcion+"\n"
-                "--------------------------------\n")
-            
-            if(cantidadResultados > 1 and cursoUnico):
-                finCursoUnico = False
-                while(not finCursoUnico):
-                    idCursoBuscar = input("Introduce el codigo del curso a elegir: ")
-                    if(idCursoBuscar.isdigit()):
-                        idEncontrado = False
-                        for curso in query:
-                            if (curso.Codigo == int(idCursoBuscar)):
-                                idEncontrado = True
-                                finCursoUnico = True
-                                finBusqueda = True
-                                codigoCurso = idCursoBuscar
-                        
-                        if (not idEncontrado):
-                            print("No existe ningun curso con ese id")
-                    else:
-                        print("Tienes que insertar un numero")
-            elif(cantidadResultados==1):
+    if (cursos):
+
+        codigoCurso = -1
+        finBusqueda = False
+        query = None
+
+        while(not finBusqueda):
+
+            print("Elige un atributo de los siguientes: ")
+            print("--- Atributos ---")
+            print("1 - Nombre")
+            print("2 - Descripcion")
+            print("0 - Salir")
+            opcion = input("Introduce una opcion: ").strip()
+
+            if(opcion=="1"):
+
+                nombreCurso = input("Introduce nombre del curso a buscar: ").strip()
+                if(nombreCurso != ""):
+                    try:
+                        query = Curso.select().where(Curso.NombreCurso == nombreCurso)
+                    except DoesNotExist:
+                        print("No hay cursos con ese nombre")
+                else:
+                    print("El nombre del curso no puede estar vacio")
+
+            elif(opcion=="2"):
+                descripcionCurso = input("Introduce descripcion del curso a buscar: ").strip()
+                if(descripcionCurso != ""):
+                    try:
+                        query = Curso.select().where(Curso.Descripcion == descripcionCurso)
+                    except DoesNotExist:
+                        print("No hay cursos con esa descripcion")
+                else:
+                    print("La descripcion el curso no puede estar vacia")
+
+            elif(opcion=="0"):
                 finBusqueda = True
-                codigoCurso = query[0].Codigo
-            elif(cantidadResultados==0):
-                if(not confirmacion("No se han encontrado resultados. Deseas buscar de nuevo? (S/N): ")):
+                print("Fin busqueda Curso")
+            else:
+                print("Opcion no valida")
+
+            if(not finBusqueda):
+                if (query is not None):
+                    cantidadResultados = query.count()
+
+                print("--- Resultado de la Busqueda ---")
+                for curso in query:
+                    print("Codigo:"+str(curso.Codigo)+"\n"
+                        "Nombre:"+curso.NombreCurso+"\n"
+                        "Descripcion:"+curso.Descripcion+"\n"
+                    "--------------------------------\n")
+
+                if(cantidadResultados > 1 and cursoUnico):
+                    finCursoUnico = False
+                    while(not finCursoUnico):
+                        idCursoBuscar = input("Introduce el codigo del curso a elegir: ")
+                        if(idCursoBuscar.isdigit()):
+                            idEncontrado = False
+                            for curso in query:
+                                if (curso.Codigo == int(idCursoBuscar)):
+                                    idEncontrado = True
+                                    finCursoUnico = True
+                                    finBusqueda = True
+                                    codigoCurso = idCursoBuscar
+
+                            if (not idEncontrado):
+                                print("No existe ningun curso con ese id")
+                        else:
+                            print("Tienes que insertar un numero")
+                elif(cantidadResultados==1):
                     finBusqueda = True
-    return codigoCurso
+                    codigoCurso = query[0].Codigo
+                elif(cantidadResultados==0):
+                    if(not confirmacion("No se han encontrado resultados. Deseas buscar de nuevo? (S/N): ")):
+                        finBusqueda = True
+        return codigoCurso
+    else:
+        print("No hay cursos en la BBDD")
 
 def mostrarTodosCursos():
     
@@ -242,22 +261,28 @@ def mostrarTodosCursos():
 
     """
     
-    print("--- Mostrar Todos los Cursos ---")
-    
-    try:
-        cursos = Curso.select()
-        
-        if(len(cursos)==0):
-            print("No hay cursos registrados")
-        
-        for curso in cursos:
-            print("Codigo:"+str(curso.Codigo)+"\n"
-                    "Nombre:"+curso.NombreCurso+"\n"
-                    "Descripcion:"+curso.Descripcion+"\n"
-            "--------------------------------\n")
-            
-    except:
-        print("No se han podido mostrar todos los cursos")
+    print("\n--- Mostrar Todos los Cursos ---")
+
+    cursos = Curso.select()
+
+    if (cursos):
+
+        try:
+            cursos = Curso.select()
+
+            if(len(cursos)==0):
+                print("No hay cursos registrados")
+
+            for curso in cursos:
+                print("Codigo:"+str(curso.Codigo)+"\n"
+                        "Nombre:"+curso.NombreCurso+"\n"
+                        "Descripcion:"+curso.Descripcion+"\n"
+                "--------------------------------\n")
+
+        except:
+            print("No se han podido mostrar todos los cursos")
+    else:
+        print("No hay cursos en la BBDD")
     
 def menuCursos():
     

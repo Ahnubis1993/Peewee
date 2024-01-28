@@ -19,27 +19,39 @@ def impartirCurso():
     """
     
     print("\n-- Asignacion de Curso a Profesor ---")
-    idProfesor = busquedaProfesor()
-    codigoCurso = busquedaCurso()
-    # Si encuentra las busquedas en la bbdd
-    if(idProfesor != -1 and codigoCurso != -1):
-        try:
-            # Ejecuto consulta para ver si el curso ya esta asignado, para ello tiene que haber algun id del curso
-            resultado = ProfesorCurso.get_or_none(Id_Curso=codigoCurso, Id_Profesor=idProfesor)
-            # Si ya existe, un profesor lo esta impartiendo
-            if(resultado):
-                print("El curso ya tiene asignado a un profesor\n")
-            # Si no, lo asignamos
+
+    profesores = Profesor.select()
+    cursos = Curso.select()
+
+    if (profesores):
+
+        if(cursos):
+
+            idProfesor = busquedaProfesor()
+            codigoCurso = busquedaCurso()
+            # Si encuentra las busquedas en la bbdd
+            if(idProfesor != -1 and codigoCurso != -1):
+                try:
+                    # Ejecuto consulta para ver si el curso ya esta asignado, para ello tiene que haber algun id del curso
+                    resultado = ProfesorCurso.get_or_none(Id_Curso=codigoCurso, Id_Profesor=idProfesor)
+                    # Si ya existe, un profesor lo esta impartiendo
+                    if(resultado):
+                        print("El curso ya tiene asignado a un profesor\n")
+                    # Si no, lo asignamos
+                    else:
+                        ProfesorCurso.create(Id_Profesor=idProfesor, Id_Curso=codigoCurso)
+                        print("El profesor ahora impartira el curso\n")
+
+                except IntegrityError:
+                    print("La asignacion no se ha podido efectuar")
+                except:
+                    print("No se ha producido ninguna accion")
             else:
-                ProfesorCurso.create(Id_Profesor=idProfesor, Id_Curso=codigoCurso)
-                print("El profesor ahora impartira el curso\n")
-                
-        except IntegrityError:
-            print("La asignacion no se ha podido efectuar")
-        except:
-            print("No se ha producido ninguna accion")
+                print("Los resultados de busqueda no se encuentran en la base de datos\n")
+        else:
+            print("No hay cursos a los que asignar un profesor")
     else:
-        print("Los resultados de busqueda no se encuentran en la base de datos\n")
+        print("No hay profesores a los que asignar un curso")
     
 def dejarImpartirCurso():
     
@@ -49,27 +61,34 @@ def dejarImpartirCurso():
     """
     
     print("\n-- Desasignacion de Curso a Profesor ---")
-    idProfesor = busquedaProfesor()
-    codigoCurso = busquedaCurso()
-    if(idProfesor != -1 and codigoCurso != -1):
-        try:
-            # Consultar si la relación existe antes de intentar borrarla, si hay un curso en la tabla, ya tiene un profesor asignado
-            relacion = ProfesorCurso.get_or_none(Id_Profesor=idProfesor, Id_Curso=codigoCurso)
 
-            if relacion:
-                # Si la relación existe, proceder con el borrado
-                if (confirmacion("Estas seguro de que deseas desasignar el curso? (S/N): ")):
-                    relacion.delete_instance()
-                    print("El profesor ha dejado de impartir el curso.")
+    asignaciones = ProfesorCurso.select()
+
+    if (asignaciones):
+
+        idProfesor = busquedaProfesor()
+        codigoCurso = busquedaCurso()
+        if(idProfesor != -1 and codigoCurso != -1):
+            try:
+                # Consultar si la relación existe antes de intentar borrarla, si hay un curso en la tabla, ya tiene un profesor asignado
+                relacion = ProfesorCurso.get_or_none(Id_Profesor=idProfesor, Id_Curso=codigoCurso)
+
+                if relacion:
+                    # Si la relación existe, proceder con el borrado
+                    if (confirmacion("Estas seguro de que deseas desasignar el curso? (S/N): ")):
+                        relacion.delete_instance()
+                        print("El profesor ha dejado de impartir el curso.")
+                    else:
+                        print("El profesor seguira impartiendo el curso.")
                 else:
-                    print("El profesor seguira impartiendo el curso.")
-            else:
-                print("El profesor no esta impartiendo ese curso.")
+                    print("El profesor no esta impartiendo ese curso.")
 
-        except Exception as e:
-            print(f"No se ha podido desvincular al profesor el curso: {e}")
+            except Exception as e:
+                print(f"No se ha podido desvincular al profesor el curso: {e}")
+        else:
+            print("Los resultados de busqueda no se encuentran en la base de datos\n")
     else:
-        print("Los resultados de busqueda no se encuentran en la base de datos\n")
+        print("No hay profesores impartiendo cursos")
     
 def matricularAlumno():
     
@@ -80,27 +99,39 @@ def matricularAlumno():
     """
     
     print("\n-- Matriculacion Alumno ---")
-    numExpediente = busquedaAlumno()
-    codigoCurso = busquedaCurso()
-    # Si encuentra las busquedas en la bbdd
-    if(numExpediente != -1 and codigoCurso != -1):
-        try:
-            # Ejecuto consulta para ver si ese curso esta asignado ya al alumno
-            resultado = AlumnoCurso.get_or_none(Id_Curso=codigoCurso, Id_Alumno=numExpediente)
-            # Si ya existe la vinculacion
-            if(resultado):
-                print("El alumno ya esta matriculado en el curso\n")
-            # Si no, lo asignamos
+
+    alumnos = Alumno.select()
+    cursos = Curso.select()
+
+    if(alumnos):
+
+        if(cursos):
+
+            numExpediente = busquedaAlumno()
+            codigoCurso = busquedaCurso()
+            # Si encuentra las busquedas en la bbdd
+            if(numExpediente != -1 and codigoCurso != -1):
+                try:
+                    # Ejecuto consulta para ver si ese curso esta asignado ya al alumno
+                    resultado = AlumnoCurso.get_or_none(Id_Curso=codigoCurso, Id_Alumno=numExpediente)
+                    # Si ya existe la vinculacion
+                    if(resultado):
+                        print("El alumno ya esta matriculado en el curso\n")
+                    # Si no, lo asignamos
+                    else:
+                        AlumnoCurso.create(Id_Alumno=numExpediente, Id_Curso=codigoCurso)
+                        print("El Alumno ahora esta matriculado en el curso\n")
+
+                except IntegrityError:
+                    print("La asignacion no se ha podido efectuar")
+                except:
+                    print("No se ha producido ninguna accion")
             else:
-                AlumnoCurso.create(Id_Alumno=numExpediente, Id_Curso=codigoCurso)
-                print("El Alumno ahora esta matriculado en el curso\n")
-                
-        except IntegrityError:
-            print("La asignacion no se ha podido efectuar")
-        except:
-            print("No se ha producido ninguna accion")
+                print("Los resultados de busqueda no se encuentran en la base de datos\n")
+        else:
+            print("No hay cursos a los que matricular el alumno")
     else:
-        print("Los resultados de busqueda no se encuentran en la base de datos\n")
+        print("No hay alumnos a los que matricular")
     
 def desmatricularAlumno():
     
@@ -111,95 +142,117 @@ def desmatricularAlumno():
     """
 
     print("\n-- Desmatriculacion Alumno ---")
-    numExpediente = busquedaAlumno()
-    codigoCurso = busquedaCurso()
-    if(numExpediente != -1 and codigoCurso != -1):
-        try:
-            # Consulta que verifica que existe la relacion en la tabla Alumnos_Cursos
-            resultado = AlumnoCurso.get_or_none(Id_Alumno=numExpediente, Id_Curso=codigoCurso)
 
-            if resultado:
-                # Si la relación existe, proceder con el borrado
-                if (confirmacion("Estas seguro de que deseas desmatricular al alumno del curso? (S/N): ")):
-                    resultado.delete_instance()
-                    print("Alumno desmatriculado correctamente.")
+    matriculaciones = AlumnoCurso.select()
+
+    if(matriculaciones):
+
+        numExpediente = busquedaAlumno()
+        codigoCurso = busquedaCurso()
+        if(numExpediente != -1 and codigoCurso != -1):
+            try:
+                # Consulta que verifica que existe la relacion en la tabla Alumnos_Cursos
+                resultado = AlumnoCurso.get_or_none(Id_Alumno=numExpediente, Id_Curso=codigoCurso)
+
+                if resultado:
+                    # Si la relación existe, proceder con el borrado
+                    if (confirmacion("Estas seguro de que deseas desmatricular al alumno del curso? (S/N): ")):
+                        resultado.delete_instance()
+                        print("Alumno desmatriculado correctamente.")
+                    else:
+                        print("Alumno no desmatriculado.")
                 else:
-                    print("Alumno no desmatriculado.")
-            else:
-                print("El alumno no esta matriculado en ese curso.")
+                    print("El alumno no esta matriculado en ese curso.")
 
-        except Exception as e:
-            print(f"No se ha podido desmatricular al alumno del curso: {e}")
+            except Exception as e:
+                print(f"No se ha podido desmatricular al alumno del curso: {e}")
+        else:
+            print("Los resultados de busqueda no se encuentran en la base de datos\n")
     else:
-        print("Los resultados de busqueda no se encuentran en la base de datos\n")
+        print("No hay alumnos matriculados en algun curso")
         
 def mostrarRelacionesAlumnos():
-    print("\n--- Mostrar Matriculaciones Alumnos ---")
-    
+
     """
     Se realiza una consulta multitabla entre alumnos y cursos y mostrar los datos de la uniones
     """
-    
-    try:
-        query = (AlumnoCurso
-                 .select(Alumno, Curso)
-                 .join(Alumno, on=(AlumnoCurso.Id_Alumno == Alumno.Num_Expediente))
-                 .switch(AlumnoCurso)
-                 .join(Curso, on=(AlumnoCurso.Id_Curso == Curso.Codigo)))
+    print("\n--- Mostrar Matriculaciones Alumnos ---")
 
-        # Ejecutar la consulta
-        resultados = query.execute()
+    matriculaciones = AlumnoCurso.select()
 
-        if(resultados):
-            for resultado in resultados:
-                # Acceder a los campos de Alumno y Curso
-                alumno = resultado.Id_Alumno
-                curso = resultado.Id_Curso
-                print("Nombre del alumno:", alumno.Nombre)
-                print("Apellidos del alumno:", alumno.Apellidos)
-                print("Curso:", curso.NombreCurso)
-                print("Descripción del curso:", curso.Descripcion)
-                print("------------------------------------")
-        else:
-            print("No hay alumnos matriculados en cursos")
-                
-        
-    except Exception as e:
-        print(f"No se han podido mostrar los datos: {e}")
+    if (matriculaciones):
+
+        try:
+            query = (AlumnoCurso
+                     .select(Alumno, Curso)
+                     .join(Alumno, on=(AlumnoCurso.Id_Alumno == Alumno.Num_Expediente))
+                     .switch(AlumnoCurso)
+                     .join(Curso, on=(AlumnoCurso.Id_Curso == Curso.Codigo)))
+
+            # Ejecutar la consulta
+            resultados = query.execute()
+
+            if(resultados):
+                for resultado in resultados:
+                    # Acceder a los campos de Alumno y Curso
+                    alumno = resultado.Id_Alumno
+                    curso = resultado.Id_Curso
+                    print("Nombre del alumno:", alumno.Nombre)
+                    print("Apellidos del alumno:", alumno.Apellidos)
+                    print("Curso:", curso.NombreCurso)
+                    print("Descripción del curso:", curso.Descripcion)
+                    print("------------------------------------")
+            else:
+                print("No hay alumnos matriculados en cursos")
+
+
+        except Exception as e:
+            print(f"No se han podido mostrar los datos: {e}")
+
+    else:
+        print("No hay alumnos matriculados en algun curso")
     
 def mostrarRelacionesProfesores():
-    print("\n--- Mostrar Asignaciones Profesor ---")
 
     """
     Se realiza una consulta multitabla entre profesores y cursos y mostrar los datos de la uniones
     """
-    
-    try:
-        query = (ProfesorCurso
-                 .select(Profesor, Curso)
-                 .join(Profesor, on=(ProfesorCurso.Id_Profesor == Profesor.Id))
-                 .switch(ProfesorCurso)
-                 .join(Curso, on=(ProfesorCurso.Id_Curso == Curso.Codigo)))
 
-        resultados = query.execute()
+    print("\n--- Mostrar Asignaciones Profesor ---")
 
-        if (resultados):
-            # Iterar sobre los resultados e imprimir la información de cada profesor y el nombre del curso
-            for resultado in resultados:
-                # Acceder a los campos de Alumno y Curso
-                profesor = resultado.Id_Profesor
-                curso = resultado.Id_Curso
-                print("Dni del profesor:", profesor.Dni)
-                print("Nombre del profesor:", profesor.Nombre)
-                print("Curso:", curso.NombreCurso)
-                print("Descripción del curso:", curso.Descripcion)
-                print("------------------------------------")
-        else:
-            print("No hay profesores asignados a cursos")
-        
-        
-    except Exception as e:
-        print(f"No se han podido mostrar los datos: {e}")
+    asignaciones = ProfesorCurso.select()
+
+    if (asignaciones):
+
+        try:
+            query = (ProfesorCurso
+                     .select(Profesor, Curso)
+                     .join(Profesor, on=(ProfesorCurso.Id_Profesor == Profesor.Id))
+                     .switch(ProfesorCurso)
+                     .join(Curso, on=(ProfesorCurso.Id_Curso == Curso.Codigo)))
+
+            resultados = query.execute()
+
+            if (resultados):
+                # Iterar sobre los resultados e imprimir la información de cada profesor y el nombre del curso
+                for resultado in resultados:
+                    # Acceder a los campos de Alumno y Curso
+                    profesor = resultado.Id_Profesor
+                    curso = resultado.Id_Curso
+                    print("Dni del profesor:", profesor.Dni)
+                    print("Nombre del profesor:", profesor.Nombre)
+                    print("Curso:", curso.NombreCurso)
+                    print("Descripción del curso:", curso.Descripcion)
+                    print("------------------------------------")
+            else:
+                print("No hay profesores asignados a cursos")
+
+
+        except Exception as e:
+            print(f"No se han podido mostrar los datos: {e}")
+
+    else:
+        print("No hay profesores impartiendo cursos")
 
 def menuVinculaciones():
     
@@ -211,7 +264,7 @@ def menuVinculaciones():
     finMenuVinculaciones = False
     
     while(not finMenuVinculaciones):  
-        print("--- Menu Vinculaciones ---")
+        print("\n--- Menu Vinculaciones ---")
         print("Elige una de las siguientes opciones")
         print("1 - Asignar curso a profesor")
         print("2 - Desasignar curso a profesor")
