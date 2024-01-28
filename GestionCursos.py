@@ -209,7 +209,7 @@ def busquedaCurso():
             if(len(cursos)>1):
                 finBusquedaIdCurso = False
                 while(not finBusquedaIdCurso):
-                    codigoCurso = input("Introduce el id del curso a elegir")
+                    codigoCurso = input("Introduce el Codigo del curso a elegir")
                     if(codigoCurso.isdigit()):
                         codigoCursoEncontrado = [curso for curso in cursos if(curso.Codigo==int(codigoCurso))]
                         if(codigoCursoEncontrado):

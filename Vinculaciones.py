@@ -5,7 +5,7 @@ from ModeloAlumno import Alumno
 from ModeloCurso import Curso
 from ModeloProfesor import Profesor
 from Utilidades import confirmacion
-from pymysql import IntegrityError
+from peewee import IntegrityError
 from ModeloProfesorCurso import ProfesorCurso
 from ModeloAlumnoCurso import AlumnoCurso
 
@@ -141,29 +141,25 @@ def mostrarRelacionesAlumnos():
     """
     
     try:
-
-        query = (Alumno
+        query = (AlumnoCurso
                  .select(Alumno, Curso)
-                 .join(AlumnoCurso)  # Une con la tabla intermedia
-                 .join(Curso)  # Une con la tabla Curso
-                 )
+                 .join(Alumno, on=(AlumnoCurso.Id_Alumno == Alumno.Num_Expediente))
+                 .switch(AlumnoCurso)
+                 .join(Curso, on=(AlumnoCurso.Id_Curso == Curso.Codigo)))
 
-        if(query):
-            # Itera sobre los resultados de la consulta
-            for alumno_curso in query:
-                print("Datos de Alumno:")
-                print("Num_Expediente:", alumno_curso.Num_Expediente)
-                print("Nombre:", alumno_curso.Nombre)
-                print("Apellidos:", alumno_curso.Apellidos)
-                print("Teléfono:", alumno_curso.Telefono)
-                print("Dirección:", alumno_curso.Direccion)
-                print("Fecha de Nacimiento:", alumno_curso.Fecha_Nacimiento)
+        # Ejecutar la consulta
+        resultados = query.execute()
 
-                print("Datos de Curso:")
-                print("Codigo:", alumno_curso.curso.Codigo)
-                print("Nombre Curso:", alumno_curso.curso.NombreCurso)
-                print("Descripcion:", alumno_curso.curso.Descripcion)
-                print("\n")
+        if(resultados):
+            for resultado in resultados:
+                # Acceder a los campos de Alumno y Curso
+                alumno = resultado.Id_Alumno
+                curso = resultado.Id_Curso
+                print("Nombre del alumno:", alumno.Nombre)
+                print("Apellidos del alumno:", alumno.Apellidos)
+                print("Curso:", curso.NombreCurso)
+                print("Descripción del curso:", curso.Descripcion)
+                print("------------------------------------")
         else:
             print("No hay alumnos matriculados en cursos")
                 
@@ -179,23 +175,25 @@ def mostrarRelacionesProfesores():
     """
     
     try:
-        relaciones = (Profesor
-                             .select(Profesor, Curso)
-                             .join(ProfesorCurso)
-                             .join(Curso)
-                             .distinct())
+        query = (ProfesorCurso
+                 .select(Profesor, Curso)
+                 .join(Profesor, on=(ProfesorCurso.Id_Profesor == Profesor.Id))
+                 .switch(ProfesorCurso)
+                 .join(Curso, on=(ProfesorCurso.Id_Curso == Curso.Codigo)))
 
-        if (relaciones):
+        resultados = query.execute()
+
+        if (resultados):
             # Iterar sobre los resultados e imprimir la información de cada profesor y el nombre del curso
-            for relacion in relaciones:
-                print("Profesor:")
-                print("ID:", relacion.Id)
-                print("DNI:", relacion.Dni)
-                print("Nombre:", relacion.Nombre)
-                print("Dirección:", relacion.Direccion)
-                print("Teléfono:", relacion.Telefono)
-                print("Curso:", relacion.NombreCurso)
-                print()
+            for resultado in resultados:
+                # Acceder a los campos de Alumno y Curso
+                profesor = resultado.Id_Profesor
+                curso = resultado.Id_Curso
+                print("Dni del profesor:", profesor.Dni)
+                print("Nombre del profesor:", profesor.Nombre)
+                print("Curso:", curso.NombreCurso)
+                print("Descripción del curso:", curso.Descripcion)
+                print("------------------------------------")
         else:
             print("No hay profesores asignados a cursos")
         

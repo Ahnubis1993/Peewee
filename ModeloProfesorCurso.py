@@ -4,8 +4,8 @@ from ModeloProfesor import Profesor
 from Utilidades import leerConfiguracion
 
 class ProfesorCurso(Model):
-    Id_Profesor = ForeignKeyField(Profesor, on_delete='CASCADE', on_update='CASCADE')
-    Id_Curso = ForeignKeyField(Curso, on_delete='CASCADE', on_update='CASCADE')
+    Id_Profesor = ForeignKeyField(Profesor, backref='curso', on_delete='CASCADE', on_update='CASCADE', column_name='Id_Profesor')
+    Id_Curso = ForeignKeyField(Curso, backref='profesor', on_delete='CASCADE', on_update='CASCADE', column_name='Id_Curso')
 
     class Meta:
         primary_key = CompositeKey('Id_Profesor', 'Id_Curso')

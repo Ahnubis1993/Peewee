@@ -7,10 +7,8 @@
     <list default="true" id="b219b795-4398-4bcb-93e7-e19f27023a66" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GestionCursos.py" beforeDir="false" afterPath="$PROJECT_DIR$/GestionCursos.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ModeloAlumno.py" beforeDir="false" afterPath="$PROJECT_DIR$/ModeloAlumno.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ModeloAlumnoCurso.py" beforeDir="false" afterPath="$PROJECT_DIR$/ModeloAlumnoCurso.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ModeloCurso.py" beforeDir="false" afterPath="$PROJECT_DIR$/ModeloCurso.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ModeloProfesor.py" beforeDir="false" afterPath="$PROJECT_DIR$/ModeloProfesor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ModeloProfesorCurso.py" beforeDir="false" afterPath="$PROJECT_DIR$/ModeloProfesorCurso.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Vinculaciones.py" beforeDir="false" afterPath="$PROJECT_DIR$/Vinculaciones.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -106,7 +104,7 @@
       <workItem from="1706130293547" duration="287000" />
       <workItem from="1706130668681" duration="667000" />
       <workItem from="1706194800078" duration="48000" />
-      <workItem from="1706285774899" duration="17963000" />
+      <workItem from="1706285774899" duration="21869000" />
     </task>
     <servers />
   </component>
@@ -128,12 +126,13 @@
     <watches-manager>
       <configuration name="PythonConfigurationType">
         <watch expression="db" />
+        <watch expression="idProfesor" />
       </configuration>
     </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/jorgeGomez_gustavoPlazaADConectores$GestorBBDD.coverage" NAME="GestorBBDD Coverage Results" MODIFIED="1705939956786" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/jorgeGomez_gustavoPlazaADConectores$ProgramaPrincipal.coverage" NAME="ProgramaPrincipal Coverage Results" MODIFIED="1706470178191" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/jorgeGomez_gustavoPlazaADConectores$ProgramaPrincipal.coverage" NAME="ProgramaPrincipal Coverage Results" MODIFIED="1706474003595" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/jorgeGomez_gustavoPlazaADConectores$GestionProfesores.coverage" NAME="GestionProfesores Coverage Results" MODIFIED="1706034493190" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
