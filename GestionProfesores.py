@@ -352,11 +352,6 @@ def mostrarTodosProfesores():
     if (profesores):
 
         try:
-            profesores = Profesor.select()
-
-            if(len(profesores)==0):
-                print("No hay profesores registrados")
-
             for p in profesores:
                 print("Id_Profesor:"+str(p.Id)+"\n"
                         "Dni:"+p.Dni+"\n"

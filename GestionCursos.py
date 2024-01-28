@@ -266,13 +266,7 @@ def mostrarTodosCursos():
     cursos = Curso.select()
 
     if (cursos):
-
         try:
-            cursos = Curso.select()
-
-            if(len(cursos)==0):
-                print("No hay cursos registrados")
-
             for curso in cursos:
                 print("Codigo:"+str(curso.Codigo)+"\n"
                         "Nombre:"+curso.NombreCurso+"\n"

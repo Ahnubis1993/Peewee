@@ -127,10 +127,10 @@ def eliminarAlumno():
     """
 
     alumnos = Alumno.select()
+    print("\n--- Baja Alumno ---")
 
     if(alumnos):
 
-        print("\n--- Baja Alumno ---")
         expediente = busquedaAlumno(True)
         if(expediente != -1):
             if (confirmacion("Estas seguro de que deseas eliminar el alumno con numero de expediente '"+str(expediente)+"'? (S/N)")):
@@ -154,9 +154,9 @@ def modificarAlumno():
     seleccionamos el atributo que se desee modificar siempre y cuando se acepte la confirmacion
 
     """
-    print("\n--- Modificacion Alumno ---")
 
     alumnos = Alumno.select()
+    print("\n--- Modificacion Alumno ---")
 
     if (alumnos):
 
@@ -406,12 +406,7 @@ def mostrarTodos():
     if (alumnos):
 
         try:
-            query = Alumno.select()
-
-            if (len(query)==0):
-                print("No hay alumnos registrados")
-
-            for alumno in query:
+            for alumno in alumnos:
                     print("Numero de expediente:"+str(alumno.Num_Expediente)+"\n"
                           "Nombre:"+alumno.Nombre+"\n"
                           "Apellidos:"+alumno.Apellidos+"\n"

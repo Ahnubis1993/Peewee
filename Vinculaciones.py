@@ -236,7 +236,7 @@ def mostrarRelacionesProfesores():
             if (resultados):
                 # Iterar sobre los resultados e imprimir la información de cada profesor y el nombre del curso
                 for resultado in resultados:
-                    # Acceder a los campos de Alumno y Curso
+                    # Acceder a los campos de Profesor y Curso
                     profesor = resultado.Id_Profesor
                     curso = resultado.Id_Curso
                     print("Dni del profesor:", profesor.Dni)
