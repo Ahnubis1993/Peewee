@@ -1,4 +1,5 @@
 from peewee import *
+from playhouse.migrate import *
 from ModeloAlumno import Alumno
 from ModeloCurso import Curso
 from ModeloProfesor import Profesor
@@ -192,6 +193,7 @@ def crearTablas(db):
     """
 
     try:
+        #db.drop_tables([Alumno, Curso, Profesor], safe=True)
         db.create_tables([Alumno, Curso, Profesor])
     except OperationalError as e:
         print(f"Error al crear las tablas: {e}")

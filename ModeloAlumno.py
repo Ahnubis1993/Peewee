@@ -20,5 +20,5 @@ class Alumno(Model):
             port=config["port"]
         )
         indexes = (
-            (('Nombre', 'Apellidos'), True),
+            (('Nombre', 'Apellidos'), True,),
         )

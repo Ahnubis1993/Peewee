@@ -18,7 +18,6 @@ while(not finMenuPrincipal):
     Alumnos, profesores y cursos se gestionan en sus correspodientes tablas, mientras que 
     en vinculaciones se realizan las uniones entre tablas de alumnos, profesores y cursos
 
-    :param parametro1: conexion a bbdd
     """
 
     print("--- Menu Principal ---")
@@ -28,7 +27,7 @@ while(not finMenuPrincipal):
     print("4 - Vinculaciones")
     print("0 - Fin Programa")
 
-    # Para capturar el error de interrupcion si salgo del programa sin ejecutar nada
+    # Para capturar el error de interrupcion si salgo del programa sin ejecutar nada (problemas del IDE)
     try:
         opcion = input("Introduce una Opcion: ")
     except KeyboardInterrupt:

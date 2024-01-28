@@ -8,9 +8,28 @@ def leerConfiguracion():
     """
 
     # Leemos fichero configuracion
-    file = open("ConfiguracionBBDD.txt", "r")
+    try:
+        file = open("ConfiguracionBBDD.txt", "r")
+    except FileNotFoundError:
+        #Si el fichero no existe se crea y se le establecen valores por defecto
+        file = open("ConfiguracionBBDD.txt", "w+")
+        file.write("db: jorgeGomez_gustavoPlaza_Pewee\n")
+        file.write("usuario: root\n")
+        file.write("contrasenia: alumno\n")
+        file.write("host: localhost\n")
+        file.write("puerto: 3306\n")
+        #file.close()
+        print("El fichero de configuracion no existia, se ha creado con valores por defecto. Para cambiar la configuracion, edita el fichero ConfiguracionBBDD.txt ")
+       
+    #file = open("ConfiguracionBBDD.txt", "r") 
     # Leo y cargo las lineas en la variable archivoConfiguracion
     archivoConfiguracion = file.readlines()
+
+    baseDatos = ""
+    usuario = ""
+    contrasenia = ""
+    host = ""
+    puerto = ""
 
     # Inserta y crea las variables para la configuracion de la BBDD (independientemnte del orden en el archivo)
     for linea in archivoConfiguracion:

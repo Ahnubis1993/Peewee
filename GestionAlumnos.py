@@ -1,5 +1,5 @@
 from Utilidades import confirmacion
-from pymysql import IntegrityError
+from peewee import IntegrityError
 from ModeloAlumno import Alumno
 import re
 
@@ -44,9 +44,9 @@ def insertarAlumno():
             correcto = False
             intentos = 5
             
-            while(not correcto and intentos>0):
+            while(not correcto and intentos > 0):
                 apellidos = input("Introduce los apellidos: ").strip()
-                if(nombre != ""): 
+                if(apellidos != ""): 
                     correcto = True   
                     print("Apellidos validos")
                 else:
@@ -101,7 +101,7 @@ def insertarAlumno():
             except IntegrityError as e:
                 # Captura error de integridad de la base de datos
                 if ("Duplicate entry" in str(e)):
-                    if ("idx_nombre_apellidos" in str(e)):
+                    if ("alumno_Nombre_Apellidos" in str(e)):
                         print("Ya existe un alumno con el mismo nombre y apellidos.")
                     else:
                         print("Ya existe un alumno con el mismo numero de expediente.")
@@ -109,7 +109,6 @@ def insertarAlumno():
                     print("La fecha de nacimiento no es correcta. Debe ser yyyy-mm-dd")
                 else:
                     print("Error al introducir el alumno en la base de datos")
-                    
             except:
                 print("Alumno no dado de alta, fallo al introducir el alumno en la base de datos")
                 
@@ -127,36 +126,29 @@ def eliminarAlumno():
 
     """
     print("--- Baja Alumno ---")
-    expediente = busquedaAlumno(conexionBBDD)
+    expediente = busquedaAlumno(True)
     if(expediente != -1):
         if (confirmacion("Estas seguro de que deseas eliminar el alumno con numero de expediente '"+str(expediente)+"'? (S/N)")):
             try:
-                cursor = conexionBBDD.cursor()
-                cursor.execute("DELETE FROM Alumnos WHERE Num_Expediente=%s",(expediente))
-                conexionBBDD.commit()
+                Alumno.delete().where(Alumno.Num_Expediente == expediente).execute()
                 print("Alumno eliminado correctamente\n")
             except:
                 print("Error al eliminar el alumno de la base de datos")
-            finally:
-                if (cursor is not None):
-                    cursor.close()
         else:
             print("Alumno con expediente '"+str(expediente)+"' no ha sido dado de baja")
     else:
         print("No hay resultados de busqueda. Fin de baja de alumno")
     
-def modificarAlumno(conexionBBDD):
+def modificarAlumno():
     
     """
     Modifica un alumno que es buscado, mediante el expediente del alumno, 
     seleccionamos el atributo que se desee modificar siempre y cuando se acepte la confirmacion
 
-    :param parametro1: conexion a bbdd
     """
-    cursor = conexionBBDD.cursor()
     print("--- Modificacion Alumno ---")
     
-    numExpediente = busquedaAlumno(conexionBBDD, True)
+    numExpediente = busquedaAlumno(True)
     finModificacion = False
     
     if(numExpediente != -1):
@@ -167,20 +159,21 @@ def modificarAlumno(conexionBBDD):
                 if (nuevoNumExpediente.isdigit()):
                     try:
                         if(confirmacion("Estas seguro de que deseas modificar el numero de expediente? (S/N): ")):
-                            cursor.execute("UPDATE Alumnos SET Num_Expediente=%s WHERE Num_Expediente=%s", (nuevoNumExpediente, numExpediente))
-                            conexionBBDD.commit()
+                            Alumno.update(Num_Expediente=nuevoNumExpediente).where(Alumno.Num_Expediente == numExpediente).execute()
                             print("El numero de expediente ha sido modificado correctamente")
                         else:
                             print("Has cancelado la modificacion")
-                    except Exception as e:#FIXME Simplemente hay que comprobar que tipo de IntegrityError es la que se ha producido
-                        print("El numero de expediente no se ha podido modificar correctamente")
+                    except Exception as e:
+                        if "Duplicate entry" in str(e):
+                            print("Ya existe un alumno con el mismo numero de expediente.")
+                else:
+                    print("El numero de expediente debe ser un numero")
             elif(opcion == "2"):
                 nuevoNombre = input("Introduce el nuevo nombre: ").strip()
                 if(nuevoNombre!= ""):
                     try:
                         if(confirmacion("Estas seguro de que deseas modificar el nombre? (S/N): ")):
-                            cursor.execute("UPDATE Alumnos SET Nombre=%s WHERE Num_Expediente=%s", (nuevoNombre, numExpediente))
-                            conexionBBDD.commit()
+                            Alumno.update(Nombre=nuevoNombre).where(Alumno.Num_Expediente == numExpediente).execute()
                             print("El nombre ha sido modificado correctamente")
                         else:
                             print("Has cancelado la modificacion")
@@ -194,8 +187,7 @@ def modificarAlumno(conexionBBDD):
                 if(nuevosApellidos!= ""):
                     try:
                         if(confirmacion("Estas seguro de que deseas modificar los apellidos? (S/N): ")):
-                            cursor.execute("UPDATE Alumnos SET Apellidos=%s WHERE Num_Expediente=%s", (nuevosApellidos, numExpediente))
-                            conexionBBDD.commit()
+                            Alumno.update(Apellidos=nuevosApellidos).where(Alumno.Num_Expediente == numExpediente).execute()
                             print("Los apellidos han sido modificados correctamente")
                         else:
                             print("Has cancelado la modificacion")
@@ -209,8 +201,7 @@ def modificarAlumno(conexionBBDD):
                 if(nuevoTelefono.isdigit() and len(nuevoTelefono)==9):
                     try:
                         if(confirmacion("Estas seguro de que deseas modificar el telefono? (S/N): ")):
-                            cursor.execute("UPDATE Alumnos SET Telefono=%s WHERE Num_Expediente=%s", (nuevoTelefono, numExpediente))
-                            conexionBBDD.commit()
+                            Alumno.update(Telefono = nuevoTelefono).where(Alumno.Num_Expediente == numExpediente).execute()
                             print("El telefono ha sido modificado correctamente")
                         else:
                             print("Has cancelado la modificacion")
@@ -223,8 +214,7 @@ def modificarAlumno(conexionBBDD):
                 if(nuevaDireccion!= ""):
                     try:
                         if(confirmacion("Estas seguro de que deseas modificar la direccion? (S/N): ")):
-                            cursor.execute("UPDATE Alumnos SET Direccion=%s WHERE Num_Expediente=%s", (nuevaDireccion, numExpediente))
-                            conexionBBDD.commit()
+                            Alumno.update(Direccion = nuevaDireccion).where(Alumno.Num_Expediente == numExpediente).execute()
                             print("La direccion ha sido modificada correctamente")
                         else:
                             print("Has cancelado la modificacion")
@@ -237,8 +227,7 @@ def modificarAlumno(conexionBBDD):
                 if("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", nuevaFechaNac):
                     try:
                         if(confirmacion("Estas seguro de que deseas modificar la fecha de nacimiento? (S/N): ")):
-                            cursor.execute("UPDATE Alumnos SET Fecha_Nacimiento=%s WHERE Num_Expediente=%s", (nuevaFechaNac, numExpediente))
-                            conexionBBDD.commit()
+                            Alumno.update(Fecha_Nacimiento = nuevaFechaNac).where(Alumno.Num_Expediente == numExpediente).execute()
                             print("La fecha de nacimiento ha sido modificada correctamente")
                         else:
                             print("Has cancelado la modificacion")
@@ -258,7 +247,6 @@ def modificarAlumno(conexionBBDD):
                 finModificacion = True
     else:
         print("No hay resultados de busqueda. Fin de modificacion de alumno")
-    cursor.close()
     
 def busquedaAlumno(alumnoUnico = False):
     
@@ -359,21 +347,23 @@ def busquedaAlumno(alumnoUnico = False):
                         "Fecha de Nacimiento:"+str(alumno.Fecha_Nacimiento)+"\n"
                         "--------------------------------\n")
             
-            if(cantidadResultados >1 and alumnoUnico):#TODO Revisar len(query)
+            if(cantidadResultados > 1 and alumnoUnico):
                 finAlumnoUnico = False
                 while(not finAlumnoUnico):
-                    expediente = input("Introduce el numero de expediente del alumno a elegir")
-                    if(expediente.isdigit()):
+                    expediente = input("Introduce el numero de expediente del alumno a elegir: ")
+                    if(expediente.isdigit()):#FIXME CAGADA MAGISTRAL
                         numExpedienteEncontrado = [alumno for alumno in query if(alumno.Num_Expediente == int(expediente))]
                         if(numExpedienteEncontrado):
                             finBusqueda = True
                             numExpediente = numExpedienteEncontrado[0]
+                        else:
+                            print("No existe ningun alumno con ese numero de expediente")
                     else:
                         print("Tienes que insertar un numero")
-            elif(cantidadResultados==1):#TODO Revisar si es necesario esta condicion
+            elif(cantidadResultados==1):
                 finBusqueda = True
                 numExpediente = query[0].Num_Expediente
-            elif (cantidadResultados==0):#TODO Esto quizas sea un else sencillo en vez de elif
+            elif(cantidadResultados==0):
                 if(not confirmacion("No se han encontrado resultados. Deseas buscar de nuevo? (S/N): ")):
                     finBusqueda = True
     return numExpediente
