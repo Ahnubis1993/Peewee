@@ -351,12 +351,16 @@ def busquedaAlumno(alumnoUnico = False):
                 finAlumnoUnico = False
                 while(not finAlumnoUnico):
                     expediente = input("Introduce el numero de expediente del alumno a elegir: ")
-                    if(expediente.isdigit()):#FIXME CAGADA MAGISTRAL
-                        numExpedienteEncontrado = [alumno for alumno in query if(alumno.Num_Expediente == int(expediente))]
-                        if(numExpedienteEncontrado):
-                            finBusqueda = True
-                            numExpediente = numExpedienteEncontrado[0]
-                        else:
+                    if(expediente.isdigit()):
+                        numExpedienteEncontrado = False
+                        for alumno in query:
+                            if (alumno.Num_Expediente == int(expediente)):
+                                numExpedienteEncontrado = True
+                                finAlumnoUnico = True
+                                finBusqueda = True
+                                numExpediente = expediente
+                        
+                        if (not numExpedienteEncontrado):
                             print("No existe ningun alumno con ese numero de expediente")
                     else:
                         print("Tienes que insertar un numero")
@@ -398,7 +402,6 @@ def menuAtributos():
     """
     Menu de atributos del alumno entre los que se pueden elegir
 
-    :param parametro1: conexion a bbdd
     """
     
     fin = False
@@ -425,7 +428,6 @@ def menuAlumnos():
     Menu de alumnos donde se pueden elegir las diferentes operaciones de gestion relacionados con el mismo
     Se pedira una opcion para entrar en alguno de los submenus, si insertas 0, sale al menuPrincipal
 
-    :param parametro1: conexion a bbdd
     """
     
     finMenuAlumno = False
