@@ -1,5 +1,4 @@
-from peewee import DoesNotExist
-from pymysql import IntegrityError
+from peewee import IntegrityError, DoesNotExist
 from Utilidades import confirmacion
 from ModeloCurso import Curso
 
@@ -70,7 +69,7 @@ def eliminarCursor():
     """
     
     print("--- Baja Curso ---")
-    codigoCurso = busquedaCurso()
+    codigoCurso = busquedaCurso(True)
     if(codigoCurso != -1):
         if(confirmacion("Estas seguro de que deseas eliminar el curso con codigo '"+str(codigoCurso)+"'? (S/N): ")):
             try:
@@ -92,7 +91,7 @@ def modificarCurso():
     
     print("--- Modificacion Curso ---")
     
-    codigoCurso = busquedaCurso()
+    codigoCurso = busquedaCurso(True)
     finModificacionCurso = False
     modificado = False
     
@@ -150,7 +149,7 @@ def modificarCurso():
     else:
         print("No hay resultados de busqueda. Fin modificacion Curso")   
         
-def busquedaCurso():
+def busquedaCurso(cursoUnico = False):
     
     """
     Busca un curso mediante cualquier atributo del mismo, si es localizado se devuelve el id 
@@ -158,11 +157,13 @@ def busquedaCurso():
 
     """
     
-    codigoCurso = -1
-    finBusquedaCurso = False
-    cursos = None
+    print("--- Busqueda Curso ---")
     
-    while(not finBusquedaCurso):
+    codigoCurso = -1
+    finBusqueda = False
+    query = None
+    
+    while(not finBusqueda):
         
         print("Elige un atributo de los siguientes: ")
         print("--- Atributos ---")
@@ -176,7 +177,7 @@ def busquedaCurso():
             nombreCurso = input("Introduce nombre del curso a buscar: ").strip()
             if(nombreCurso != ""):
                 try:
-                    cursos = Curso.select().where(Curso.NombreCurso == nombreCurso)
+                    query = Curso.select().where(Curso.NombreCurso == nombreCurso)
                 except DoesNotExist:
                     print("No hay Cursos con ese Nombre")
             else:
@@ -186,44 +187,52 @@ def busquedaCurso():
             descripcionCurso = input("Introduce descripcion del curso a buscar: ").strip()
             if(descripcionCurso != ""):
                 try:
-                    cursos = Curso.select().where(Curso.Descripcion == descripcionCurso)
+                    query = Curso.select().where(Curso.Descripcion == descripcionCurso)
                 except DoesNotExist:
                     print("No hay Cursos con esa descripcion")
             else:
                 print("La descripcion el curso no puede estar vacia")
             
         elif(opcion=="0"):
-            finBusquedaCurso = True
+            finBusqueda = True
             print("Fin busqueda Curso")
         else:
             print("Opcion no valida")
             
-        if(not finBusquedaCurso and cursos):
-            print("--- Resultado de la busqueda ---")
-            for curso in cursos:
+        if(not finBusqueda):
+            if (query is not None):
+                cantidadResultados = query.count()
+                
+            print("--- Resultado de la Busqueda ---")
+            for curso in query:
                 print("Codigo:"+str(curso.Codigo)+"\n"
                     "Nombre:"+curso.NombreCurso+"\n"
                     "Descripcion:"+curso.Descripcion+"\n"
                 "--------------------------------\n")
             
-            if(len(cursos)>1):
-                finBusquedaIdCurso = False
-                while(not finBusquedaIdCurso):
-                    codigoCurso = input("Introduce el id del curso a elegir")
-                    if(codigoCurso.isdigit()):
-                        codigoCursoEncontrado = [curso for curso in cursos if(curso.Codigo==int(codigoCurso))]
-                        if(codigoCursoEncontrado):
-                            codigoCurso = codigoCursoEncontrado[0]
-                            finBusquedaIdCurso = True
+            if(cantidadResultados > 1 and cursoUnico):
+                finCursoUnico = False
+                while(not finCursoUnico):
+                    idCursoBuscar = input("Introduce el codigo del curso a elegir: ")
+                    if(idCursoBuscar.isdigit()):
+                        idEncontrado = False
+                        for curso in query:
+                            if (curso.Codigo == int(idCursoBuscar)):
+                                idEncontrado = True
+                                finCursoUnico = True
+                                finBusqueda = True
+                                codigoCurso = idCursoBuscar
+                        
+                        if (not idEncontrado):
+                            print("No existe ningun curso con ese id")
                     else:
                         print("Tienes que insertar un numero")
-            elif(len(cursos)==1):
-                codigoCurso = cursos[0].Codigo
-                finBusquedaCurso = True
-        else:
-            if(not confirmacion("No se han encontrado resultados. Deseas buscar de nuevo? (S/N): ")):
-                finBusquedaCurso = True 
-        
+            elif(cantidadResultados==1):
+                finBusqueda = True
+                codigoCurso = query[0].Codigo
+            elif(cantidadResultados==0):
+                if(not confirmacion("No se han encontrado resultados. Deseas buscar de nuevo? (S/N): ")):
+                    finBusqueda = True
     return codigoCurso
 
 def mostrarTodosCursos():

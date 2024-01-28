@@ -195,7 +195,7 @@ def crearTablas(db):
     """
 
     try:
-        #db.drop_tables([Alumno, Curso, Profesor], safe=True)
+        #db.drop_tables([Alumno, Curso, Profesor, ProfesorCurso, AlumnoCurso], safe=True)
         db.create_tables([Alumno, Curso, Profesor, ProfesorCurso, AlumnoCurso])
     except OperationalError as e:
         print(f"Error al crear las tablas: {e}")

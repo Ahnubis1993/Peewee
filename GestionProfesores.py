@@ -98,7 +98,7 @@ def eliminarProfesor():
     """
 
     print("--- Baja Profesor ---")
-    idProfesor = busquedaProfesor()
+    idProfesor = busquedaProfesor(True)
 
     if(idProfesor != -1):
 
@@ -120,7 +120,7 @@ def modificarProfesor():
 
     print("--- Modificacion Profesor ---")
 
-    idProfesor = busquedaProfesor()
+    idProfesor = busquedaProfesor(True)
     finModificacionProfesor = False
     modificado = False
 
@@ -140,7 +140,7 @@ def modificarProfesor():
                         else:
                             print("Has cancelado la modificacion del DNI del profesor")
                     except IntegrityError as e:
-                        if "UNIQUE constraint " in str(e):
+                        if "Duplicate entry" in str(e):
                             print("Ya existe un profesor con el mismo DNI.")
                         else:
                             print("Error al modificar el DNI del profesor")
@@ -213,7 +213,7 @@ def modificarProfesor():
     else:
         print("No hay resultados de busqueda. Fin modificar profesor")
 
-def busquedaProfesor():
+def busquedaProfesor(profesorUnico = False):
 
     """
     Busca un profesor mediante cualquier atributo del mismo, si es localizado se devuelve el id 
@@ -223,11 +223,11 @@ def busquedaProfesor():
 
     print("--- Busqueda Profesor ---")
 
-    profesores = None
+    query = None
     idProfesor = -1
-    finBusquedaProfesor = False
+    finBusqueda = False
 
-    while(not finBusquedaProfesor):
+    while(not finBusqueda):
         opcion = menuAtributos()
 
         if(opcion=="1"):
@@ -235,7 +235,7 @@ def busquedaProfesor():
             dniProfesor = input("Introduce dni del profesor a buscar: ").strip()
             if(len(dniProfesor)==9 and dniProfesor[8:].isdigit and dniProfesor[8:].isalpha):
                 try:
-                    profesores = Profesor.select().where(Profesor.Dni == dniProfesor)
+                    query = Profesor.select().where(Profesor.Dni == dniProfesor)
                 except DoesNotExist:
                     print("No hay profesores con ese Dni")
             else:
@@ -246,7 +246,7 @@ def busquedaProfesor():
             nombreProfesor = input("Introduce nombre del profesor a buscar: ").strip()
             if(nombreProfesor != ""):
                 try:
-                    profesores = Profesor.select().where(Profesor.Nombre == nombreProfesor)
+                    query = Profesor.select().where(Profesor.Nombre == nombreProfesor)
                 except DoesNotExist:
                     print("No hay profesores con ese Nombre")
             else:
@@ -257,7 +257,7 @@ def busquedaProfesor():
             direccionProfesor = input("Introduce direccion del profesor a buscar").strip()
             if(direccionProfesor != ""):
                 try:
-                    profesores = Profesor.select().where(Profesor.Direccion == direccionProfesor)
+                    query = Profesor.select().where(Profesor.Direccion == direccionProfesor)
                 except DoesNotExist:
                     print("No hay profesores con esa Direccion")
             else:
@@ -268,22 +268,24 @@ def busquedaProfesor():
             telefonoProfesor = input("Introduce telefono del profesor a buscar: ").strip()
             if(telefonoProfesor.isdigit() and len(telefonoProfesor)==9):
                 try:
-                    profesores = Profesor.select().where(Profesor.Telefono == telefonoProfesor)
+                    query = Profesor.select().where(Profesor.Telefono == telefonoProfesor)
                 except DoesNotExist:
                     print("No hay profesores con ese Telefono")
             else:
                 print("El telefono debe tener una longitud de 9 digitos")
 
         elif(opcion=="0"):
-            finBusquedaProfesor = True
+            finBusqueda = True
             print("Fin busqueda Profesor")
         else:
             print("Opcion no valida")
 
-        if(not finBusquedaProfesor and profesores):
-
-            print("--- Resultado ---")
-            for p in profesores:
+        if(not finBusqueda):
+            if (query is not None):
+                cantidadResultados = query.count()
+                
+            print("--- Resultado de la Busqueda ---")
+            for p in query:
                 print("Id_Profesor:"+str(p.Id)+"\n"
                       "Dni:"+p.Dni+"\n"
                       "Nombre:"+p.Nombre+"\n"
@@ -291,29 +293,29 @@ def busquedaProfesor():
                       "Telefono:"+p.Telefono+"\n"
                       "--------------------------------\n")
 
-            if(len(profesores)>1):
-
-                finIdProfesor = False
-                while(not finIdProfesor):
-                    idProfesorBuscar = input("Introduce el id del profesor a elegir")
-
+            if(cantidadResultados > 1 and profesorUnico):
+                finProfesorUnico = False
+                while(not finProfesorUnico):
+                    idProfesorBuscar = input("Introduce el id del profesor a elegir: ")
                     if(idProfesorBuscar.isdigit()):
-                        idProfesorEncontrado = [profesor for profesor in profesores if(profesor.Id==int(idProfesorBuscar))]
-
-                        if(idProfesorEncontrado):
-                            idProfesor = idProfesorEncontrado[0]
-                            finBusquedaProfesor = True
+                        idEncontrado = False
+                        for profesor in query:
+                            if (profesor.Id == int(idProfesorBuscar)):
+                                idEncontrado = True
+                                finProfesorUnico = True
+                                finBusqueda = True
+                                idProfesor = idProfesorBuscar
+                        
+                        if (not idEncontrado):
+                            print("No existe ningun profesor con ese id")
                     else:
                         print("Tienes que insertar un numero")
-
-            elif(len(profesores)==1):
-
-                idProfesor = profesores[0].Id
-                finBusquedaProfesor = True
-
-        else:
-            if(not confirmacion("No se han encontrado resultados. Deseas buscar de nuevo? (S/N): ")):
-                finBusquedaProfesor = True
+            elif(cantidadResultados==1):
+                finBusqueda = True
+                idProfesor = query[0].Id
+            elif(cantidadResultados==0):
+                if(not confirmacion("No se han encontrado resultados. Deseas buscar de nuevo? (S/N): ")):
+                    finBusqueda = True
     return idProfesor
 
 
